@@ -1,0 +1,124 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Cliente.PDCliente
+@{
+    ViewBag.Title = "Dados complementares do cliente";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#Telefone').setMask({ mask: "9999-9999" });
+        $('#DDI').setMask({ mask: "+99" });
+        $('#DDD').setMask({ mask: "99" });
+
+        //Salvar dados
+        $("#formTelefoneCliente").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $("#TelefoneCliente").jqGrid().trigger("reloadGrid");
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    $('#codigoTelefone').val("");
+                    $('#DDD').val("");
+                    $('#Telefone').val("");
+                    $('#cmbtipoTel').val("");
+                }
+                else {
+                    alert('erro telefone cliente');
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>
+<div class="divTituloPagina">
+    <h3>
+        Telefone(s)</h3>
+</div>
+@using (Ajax.BeginForm("SalvarTelefone", "Cliente", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm", id = "formTelefoneCliente" }
+        ))
+{
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.TelefoneCliente.CodigoCliente, new { @class = "textInput", id = "telefoneCodigoCliente" })
+        @Html.HiddenFor(m => m.TelefoneCliente.Codigo, new { @class = "textInput", id = "codigoTelefone" })
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.TelefoneCliente.TipoTelefone)
+            @Html.DropDownListFor(m => m.TelefoneCliente.TipoTelefone, TempData["TiposTelefone"] as IEnumerable<SelectListItem>, "Selecione um Tipo de Telefone", new { @class = "textInput", id = "cmbtipoTel", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.TelefoneCliente.TipoTelefone)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.TelefoneCliente.TipoTelefone)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.TelefoneCliente.DDI)
+            @Html.TextBoxFor(m => m.TelefoneCliente.DDI, new { @class = "textInput", style = "width: 5% !important", id = "DDI" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.TelefoneCliente.DDI)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.TelefoneCliente.DDI)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.TelefoneCliente.DDD)
+            @Html.TextBoxFor(m => m.TelefoneCliente.DDD, new { @class = "textInput", style = "width: 5% !important", id = "DDD" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.TelefoneCliente.DDD)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.TelefoneCliente.DDD)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.TelefoneCliente.Telefone)
+            @Html.TextBoxFor(m => m.TelefoneCliente.Telefone, new { @class = "textInput", id = "Telefone", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.TelefoneCliente.Telefone)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.TelefoneCliente.Telefone)</p>
+        </div>              
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar Telefone" title="Adicionar um telefone do cliente"  />
+        </div>
+    </fieldset>
+}
+ <div id="line">
+        </div>
+<div id="divTabela">
+    @Html.Grid(new GridControl()
+        .SetName("TelefoneCliente")
+        .SetPageSize(15)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(string.Format(Url.Content("~/Cliente/ObterTelefoneCliente/?codigoCliente={0}"), (Model.Cliente.Codigo)))
+        .SetAdditionalAttributes(",ondblClickRow:doubleClickTelefone")
+        .SetHeight("200")
+        .SetWidth("1250")
+        .UseColumns(GLJ.Models.Cliente.GridClienteModel.BETelefoneCienteColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>
+<script type="text/javascript">
+    function doubleClickTelefone(rowid, iRow, iCol, e) {
+        var dado = $("#TelefoneCliente").getRowData(rowid);
+
+        $('#telefoneCodigoCliente').val(dado.CodigoCliente);
+        $('#codigoTelefone').val(dado.Codigo);
+        $('#cmbtipoTel').val(dado.TipoTelefone);
+        $('#DDI').val(dado.DDI);
+        $('#DDD').val(dado.DDD);
+        $('#Telefone').val(dado.Telefone);   
+    }
+  
+    function enumTipoTelefoneToString(cellvalue, options, rowObject) {
+        var descricao = '';
+        $.post(url + "/Cliente/CarregarTipoTelefone/", { enumValue: cellvalue }, function (ret) {
+            descricao = ret.Descricao;
+        });
+        return descricao;
+    }
+</script>

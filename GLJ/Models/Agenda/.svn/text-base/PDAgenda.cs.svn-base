@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using GLJ.Business.Entity;
+
+namespace GLJ.Models.Agenda
+{
+    public class PDAgenda : ProcessData
+    {        
+        public BEPedido Pedido { get; set; }
+        public BEAgendaEntrega AgendaEntrega { get; set; }
+        public BEAgendaMontagem AgendaMontagem { get; set; }
+
+        public PDAgenda()
+        {
+            AgendaEntrega = new BEAgendaEntrega();
+            AgendaMontagem = new BEAgendaMontagem();
+            Pedido = new BEPedido();
+        }
+    }
+}

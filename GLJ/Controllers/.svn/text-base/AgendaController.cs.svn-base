@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using GLJ.Models.Agenda;
+using GLJ.Models.BPFacade;
+using GLJ.Filter.Entity;
+using GLJ.Business.Entity;
+
+namespace GLJ.Controllers
+{
+    public class AgendaController : BaseControllerGeneric<PDAgenda>
+    {
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Buscar Agenda Ativos
+        /// </summary>      
+        public JsonResult BuscarAgendaAtiva(double? start, double? end)
+        {
+            FEAgendaEntrega feAgendaEntrega = new FEAgendaEntrega();
+            //feAgendaEntrega.DataInicio = start;
+            //feAgendaEntrega.DataFim = end;
+            feAgendaEntrega.StatusAgenda = StatusAgendaEntrega.ATIVA;
+            List<AgendaModelo> listAgenda = new BPFAgendaEntrega().ObterAgendaPedidos(feAgendaEntrega);
+            return Json(listAgenda.ToArray(),JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Buscar Todos Eventos
+        /// </summary>
+        public JsonResult BuscarAgenda(double? start, double? end)
+        {
+            FEAgendaEntrega feAgendaEntrega = new FEAgendaEntrega();
+            //feAgendaEntrega.DataInicio = start;
+            //feAgendaEntrega.DataFim = end;
+            List<AgendaModelo> listAgenda = new BPFAgendaEntrega().ObterAgendaPedidos(feAgendaEntrega);
+            return Json(listAgenda.ToArray(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult SalvarEvento(int codigoAgenda, int codigoPedido,string data)
+        {
+            try
+            {
+               DateTime dataEntrega = new DateTime();
+               if (DateTime.TryParse(data, out dataEntrega))
+               {
+                   FEAgendaEntrega feAgendaEntrega = new FEAgendaEntrega { Codigo = codigoAgenda, CodigoPedido = codigoPedido };
+                   new BPFAgendaEntrega().AlterarDataEntrega(feAgendaEntrega, dataEntrega);
+                   return Json(new JsonReturn(true,"Data Altera com sucesso"),JsonRequestBehavior.AllowGet);
+               }
+               else
+               {
+                   return Json(new JsonReturn(false,"Erro ao alterar a data de entrega"), JsonRequestBehavior.AllowGet);
+               }
+            }
+            catch (Exception ex)
+            {
+                return Json(new JsonReturn(false,ex.Message), JsonRequestBehavior.AllowGet);
+            }
+        }
+    }
+}

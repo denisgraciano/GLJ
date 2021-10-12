@@ -1,0 +1,102 @@
+﻿@model GLJ.Models.Pedido.PDPedido
+@using MVC.Controls
+@using MVC.Controls.Grid
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#popupBuscaProduto").dialog('close');
+
+        $('#txtProduto').autocomplete({
+            source: '@Url.Action("AutoCompleteProduto", "Produto")',
+            minLength: 3,
+            select: function (e, data) {
+                $.post('@Url.Action("AdicionarProduto", "Pedido")', { Codigo: data.item.Codigo }, function (result) {
+                    if (result.Success) {
+                        AtualizarPedido();
+                        $('#txtProduto').val('');
+                    }
+                    else {
+                        $('.error').html(result.Mensage);
+                        $('.error').show();
+                    }
+                });
+            }
+        });
+
+
+        $('#imgPesquisarProduto').click(function () {
+            $("#popupBuscaProduto").dialog('open');
+        });
+
+        $("#popupBuscaProduto").dialog({ autoOpen: false, title: 'Busca de Produto', modal: true, resizable: false, height: 600, width: 800,
+            beforeClose: function (event, ui) {
+                $("#ProdutoGrid").jqGrid().trigger("reloadGrid");
+            }
+        });
+
+        $("#btnBuscarProduto").click(function () {
+            $.post('@Url.Action("BuscarProdutoPopUp", "Produto")', { Descricao: $('#txtDesc').val(), CodigoFornecedor: $('#txtCdFr').val() }, function (retorno) {
+                $("#ProdutoGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+
+    function doubleClick(rowid, iRow, iCol, e) {
+        //$('#txtCodigoCliente').val($("#ClienteGrid").getRowData(rowid).Codigo);
+
+        $.post('@Url.Action("AdicionarProduto", "Pedido")', { Codigo: $("#ProdutoGrid").getRowData(rowid).Codigo }, function (result) {
+            if (result.Success) {
+                AtualizarPedido();
+            }
+            else {
+                alert(result.Mensage);
+            }
+        });
+
+
+
+
+        $("#popupBuscaProduto").dialog('close');
+    }
+
+</script>
+<div class="ctrlHolder">
+    @Html.Label("Produto")
+    @Html.TextBox("ProdutoComplete", null, new { @class = "textInput", id = "txtProduto", style = "width: 50%", })
+    <img id="imgPesquisarProduto" src='@Url.Content("~/Content/img/finder_24.png")' />
+    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Digite o nome do produto para buscar ou clique em pesquisar." alt=""  />
+</div>
+<div id="popupBuscaProduto" title="Buscar Produto">
+    <fieldset>
+        <div class="popupForm">
+            @Html.LabelFor(m => m.FEProduto.Descricao)
+            @Html.TextBoxFor(m => m.FEProduto.Descricao, new { @class = "textInput", id = "txtDesc" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.Nome)" alt="" />
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(m => m.FEProduto.CodigoFornecedorProduto)
+            @Html.TextBoxFor(m => m.FEProduto.CodigoFornecedorProduto, new { @class = "textInput", id = "txtCdFr" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.Cpf)" alt="" />
+        </div>
+        <div class="buttonAction">
+            <input type="button" class="primaryAction" value="Buscar" id="btnBuscarProduto" />
+            <input type="button" class="primaryAction" value="Limpar" id="btnLimparProduto" />
+        </div>
+    </fieldset>
+    <div id="grid">
+        @Html.Grid(new GridControl()
+        .SetName("ProdutoGrid")
+        .SetPageSize(20)
+        .SetListUrl(Url.Content("~/Produto/Buscar"))
+        .SetWidth("700")
+        .UseColumns(GLJ.Models.Produto.GridProdutoModel.BEProdutoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                 ))
+    </div>
+</div>

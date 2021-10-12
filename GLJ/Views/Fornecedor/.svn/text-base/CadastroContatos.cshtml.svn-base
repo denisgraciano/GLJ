@@ -1,0 +1,102 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Fornecedor.PDFornecedor
+@{
+    ViewBag.Title = "Cadastro de Contatos do Fornecedor";
+}
+<div class="divTituloPagina">
+    <h3>@ViewBag.Title</h3>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#phone').setMask();
+        $('#fax').setMask();
+        $('#cel').setMask();
+    });
+</script>
+@using (Html.BeginForm("SalvarContato", "Fornecedor", FormMethod.Post, new { enctype = "multipart/form-data", id = "formContatoFornecedor", @class = "uniForm" }))
+{
+    <fieldset class="inlineLabels">
+        <h3>
+            Cadastro de Contato - Fornecedor</h3>
+        @Html.HiddenFor(m => m.Fornecedor.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Fornecedor.Nome)
+            @Html.TextBoxFor(m => m.Contato.Fornecedor.Nome, new { @readonly = "readonly", @class = "textInput" })
+            @Html.HiddenFor(m => m.Contato.Fornecedor.Codigo, new { @readonly = "readonly" })
+            @Html.HiddenFor(m => m.Contato.Codigo, new { @readonly = "readonly" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Contato.Nome)
+            @Html.TextBoxFor(m => m.Contato.Nome, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Contato.Nome)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Contato.Email)
+            @Html.TextBoxFor(m => m.Contato.Email, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o E-Mail." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Contato.Email)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Contato.Fone)
+            @Html.TextBoxFor(m => m.Contato.Fone, new { @class = "textInput", style = "width: 15% !important", id = "phone", alt = "phone" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Telefone." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Contato.Fone)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Contato.FAX)
+            @Html.TextBoxFor(m => m.Contato.FAX, new { @class = "textInput", style = "width: 15% !important", id = "fax", alt = "phone" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Fax." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Contato.FAX)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Contato.CEL)
+            @Html.TextBoxFor(m => m.Contato.CEL, new { @class = "textInput", style = "width: 15% !important", id = "cel", alt = "phone" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Celular." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Contato.CEL)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar" />
+        </div>
+    </fieldset>
+  
+}
+<div id="divTabela">
+    @Html.Grid(new GridControl()
+        .SetName("gridContato")
+        .SetPageSize(15)
+        .SetHttpVerb(HttpVerbs.Get)
+                        .SetListUrl(string.Format(Url.Content("~/Fornecedor/ObterContatos/?codigoFornecedor={0}"), (Model.Contato.CodigoFornecedor)))
+        .SetAdditionalAttributes(",ondblClickRow:doubleClickProdutoItem")
+        .SetHeight("200")
+        .SetWidth("1000")
+        .UseColumns(GLJ.Models.Fornecedor.GridFornecedorModel.BEContatoForncedorColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>
+<div class="secondaryAction">
+    @Html.ActionLink("Finaliza Cadastro", "ConsultarFornecedor")
+</div>
+<script type="text/javascript">
+    function doubleClickProdutoItem(rowid, iRow, iCol, e) {
+        var contato = $("#gridContato").getRowData(rowid);
+
+        $("[name='Contato.Codigo']").val(contato.Codigo);
+        $("[name='Contato.Nome']").val(contato.Nome);
+        $("[name='Contato.Email']").val(contato.Email);
+        $("[name='Contato.Fone']").val(contato.Fone);
+        $("[name='Contato.FAX']").val(contato.FAX);
+        $("[name='Contato.CEL']").val(contato.CEL);
+    }
+</script>

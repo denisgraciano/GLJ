@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Tabela de Preço";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Preco.PDPreco
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarPreco", "Preco", FormMethod.Post, new { id = "formBuscarPreco", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEPreco.CodigoProduto)
+                    @Html.DropDownListFor(m => m.FEPreco.CodigoProduto, TempData["Produto"] as IEnumerable<SelectListItem>, "Selecione um Produto", new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Produto." alt="" />
+                </div>
+                
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("PrecoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Preco/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Preco.GridPrecoModel.BEPrecoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarPreco").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#PrecoGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + '@Url.Content("~/Preco/CadastroPreco/")' + $("#PrecoGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

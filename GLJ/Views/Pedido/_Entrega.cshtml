@@ -1,0 +1,59 @@
+﻿@model  GLJ.Models.Pedido.PDPedido
+@{
+    ViewBag.Title = "Agenda - Pedidos";
+}
+@*@Html.Partial("_Calendario", Model)*@
+<div class="line">
+</div>
+<div class="uniForm">
+    <fieldset class="inlineLabels">
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Pedido.DataCompra)
+            @Html.TextBoxFor(m => m.Pedido.DataCompra, new { @readonly = "readonly", @class = "textInput" })
+            @Html.TextBoxFor(m => m.Pedido.DataMontagemPedido, new { @readonly = "readonly", @class = "textInput" })
+            @Html.TextBoxFor(m => m.DataEnt, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Pedido.DataEntrega)
+            @Html.TextBoxFor(m => m.Pedido.DataEntrega, new { id = "data", @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Data de Entrega do Pedido." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Pedido.DataEntrega)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="button" class="primaryAction" value="Continuar" onclick="Finalizar();" />
+            <div class="secondaryAction">
+                @Html.ActionLink("Cancelar", "CancelarPedido", "Pedido")
+            </div>
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //s$("#dataEntrega").datepicker({ dateFormat: 'dd/mm/yy' });
+    });
+    function CarregarEntrega(data) {
+        alert(data.DataEnt);
+       // $("#data").val(data);
+
+    }
+
+    function Finalizar() {
+        $.post('@Url.Action("SalvarDataEntrega", "Pedido")', null, function (data) {
+            if (data.Success) {
+                $('#tabs').tabs('enable', 3);
+                $('#tabs').tabs('select', 3);
+
+                //Resumo do Pedido;
+                var html = "";
+
+                $('.success').html(data.Mensage);
+                $('.success').show();
+            }
+            else {
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+    }
+</script>

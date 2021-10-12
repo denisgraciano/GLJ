@@ -1,0 +1,55 @@
+﻿@model GLJ.Models.Vendedor.PDVendedor
+@{
+    ViewBag.Title = "Cadastro de Vendedor";
+}
+  <div class="divTituloPagina">
+            <h3>
+                Observação do cliente</h3>
+        </div>
+@using (Ajax.BeginForm("Salvar", "Vendedor", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">    
+        @Html.HiddenFor(m => m.Vendedor.Codigo)        
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Vendedor.Usuario.NomeUsuario)
+            @if (Model.Vendedor.CodigoUsuario > 0)
+            {
+                @Html.HiddenFor(m => m.Vendedor.CodigoUsuario)
+                @Html.TextBoxFor(m => m.Vendedor.Usuario.NomeUsuario, new { @readonly = "readonly", @class = "textInput" })
+            }
+            else
+            {
+                @Html.DropDownListFor(m => m.Vendedor.CodigoUsuario, TempData["Usuarios"] as IEnumerable<SelectListItem>, "Selecione um Vendedor", new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Vendedor." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Vendedor.CodigoUsuario)</p>
+            }
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Vendedor.MargemVenda)
+            @Html.TextBoxFor(m => m.Vendedor.MargemVenda, new { @class = "textInput", style = "width: 5% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Margem de Desconto do Vendedor." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Vendedor.MargemVenda)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Vendedor.ComissaoVendedor)
+            @Html.TextBoxFor(m => m.Vendedor.ComissaoVendedor, new { @class = "textInput", style = "width: 5% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Comissão do Vendedor." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Vendedor.ComissaoVendedor)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+             <div class="secondaryAction">
+            @Html.ActionLink("Finaliza Cadastro", "ConsultarVendedor")
+            </div>
+        </div>
+    </fieldset>
+}

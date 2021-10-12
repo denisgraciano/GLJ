@@ -1,0 +1,144 @@
+10
+
+dir
+712
+https://subversion.assembla.com/svn/wpdgvm-onion/GLJ/Site/GLJ/Views
+https://subversion.assembla.com/svn/wpdgvm-onion
+
+
+
+2012-03-04T20:58:17.735359Z
+711
+wseara
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+f8c9096f-6e2a-4a4d-a7cb-9237e33dd8ac
+
+Agenda
+dir
+
+_ViewStart.cshtml
+file
+
+
+
+
+2011-11-30T02:05:40.524516Z
+69e468f28dacc998525ae89a24bc9fa9
+2011-11-29T16:10:14.947019Z
+454
+denisgraciano
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+55
+
+Web.config
+file
+
+
+
+
+2012-01-29T23:44:48.050794Z
+963b91330e4449579a7288742d35c010
+2012-01-29T19:48:10.481145Z
+631
+wseara
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2919
+
+Cliente
+dir
+
+Estoque
+dir
+
+Loja
+dir
+
+Fornecedor
+dir
+
+TipoProduto
+dir
+
+Home
+dir
+
+Produto
+dir
+
+Configuracao
+dir
+
+Pedido
+dir
+
+Vendedor
+dir
+
+FilialLoja
+dir
+
+Shared
+dir
+
+Preco
+dir
+
+Login
+dir
+
+Acesso
+dir
+

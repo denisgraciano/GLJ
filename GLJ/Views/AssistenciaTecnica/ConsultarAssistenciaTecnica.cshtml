@@ -1,0 +1,119 @@
+﻿@{
+    ViewBag.Title = "Consulta de Assistencias Técnicas";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.AssistenciaTecnica.PDAssistenciaTecnica
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarAssistenciaTecnica", "AssistenciaTecnica", FormMethod.Post, new { id = "formBuscarAssistenciaTecnica", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEPedido.Codigo)
+                    @Html.TextBoxFor(m => m.FEPedido.Codigo, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Código do Pedido" alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEPedido.DataEntregaInicio)
+                    @Html.TextBoxFor(m => m.FEPedido.DataEntregaInicio, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Periodo do Pedido" alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEPedido.DataEntregaFim)
+                    @Html.TextBoxFor(m => m.FEPedido.DataEntregaFim, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Periodo do Pedido" alt="" />
+                </div>                                
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("AssistenciaTecnicaGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/AssistenciaTecnica/Buscar"))
+        .SetEditUrl(Url.Content("~/AssistenciaTecnica/AtualizarStatusAssistenciaItem"))        
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.AssistenciaTecnica.GridAssistenciaTecnicaModel.BEAssistenciaTecnica)
+        .SetAdditionalAttributes(",gridComplete:columnCustom,ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(true, true)
+        ))
+</div>  
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarAssistenciaTecnica").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#AssistenciaTecnicaGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + '@Url.Content("~/AssistenciaTecnica/CadastroAssistencia/")' + $("#AssistenciaTecnicaGrid").getRowData(rowid).Codigo, "_self");
+    }
+
+    function columnCustom() {
+        var ids = $("#AssistenciaTecnicaGrid").jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            var cl = ids[i];
+
+            be = "<input title='Editar Status da Assistência' id='btnEditar" + cl + "' class='btnEdit' type='button' onclick=\"EditRow('" + cl + "')\"  />";
+            se = "<input title='Salvar alteração' id='btnSalvar" + cl + "' style='display : none'  class='btnSave' type='button' onclick=\"SaveRow('" + cl + "')\" />";
+            ce = "<input title='Cancelar Alteração' id='btnCancelar" + cl + "' style='display : none' class='btnUndo' type='button' onclick=\"RestoreRow('" + cl + "')\" />";
+
+            $("#AssistenciaTecnicaGrid").jqGrid('setRowData', ids[i], { action: be + se + ce });
+        }
+    }
+    function EditRow(cl) {
+        $('#AssistenciaTecnicaGrid').editRow(cl);
+        $('#btnSalvar' + cl).show();
+        $('#btnCancelar' + cl).show();
+        $('#btnEditar' + cl).hide();
+    }
+
+    function SaveRow(cl) {
+        $('#AssistenciaTecnicaGrid').saveRow(cl);
+        $('#btnSalvar' + cl).hide();
+        $('#btnCancelar' + cl).hide();
+        $('#btnEditar' + cl).show();
+    }
+
+    function RestoreRow(cl) {
+        $('#AssistenciaTecnicaGrid').restoreRow(cl);
+        $('#btnSalvar' + cl).hide();
+        $('#btnCancelar' + cl).hide();
+        $('#btnEditar' + cl).show();
+    }
+
+
+
+
+    function enumToString(cellvalue, options, rowObject) {
+        var descricao = '';
+        $.post(url + "/AssistenciaTecnica/ObterEnumDescricaoItem/", { enumValue: cellvalue }, function (ret) {
+            descricao = ret.Descricao;
+        });
+        return descricao;
+    }
+
+</script>

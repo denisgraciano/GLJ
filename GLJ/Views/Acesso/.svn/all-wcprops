@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/wpdgvm-onion/!svn/ver/698/GLJ/Site/GLJ/Views/Acesso
+END
+Index.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/wpdgvm-onion/!svn/ver/500/GLJ/Site/GLJ/Views/Acesso/Index.cshtml
+END
+CadastroGrupoView.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/wpdgvm-onion/!svn/ver/498/GLJ/Site/GLJ/Views/Acesso/CadastroGrupoView.cshtml
+END
+CadastroUsuario.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/wpdgvm-onion/!svn/ver/493/GLJ/Site/GLJ/Views/Acesso/CadastroUsuario.cshtml
+END
+ConsultaGrupoPermissao.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/wpdgvm-onion/!svn/ver/669/GLJ/Site/GLJ/Views/Acesso/ConsultaGrupoPermissao.cshtml
+END
+ConsultarUsuarioFilialLoja.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/wpdgvm-onion/!svn/ver/698/GLJ/Site/GLJ/Views/Acesso/ConsultarUsuarioFilialLoja.cshtml
+END
+CadastroGrupoPermissao.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/wpdgvm-onion/!svn/ver/486/GLJ/Site/GLJ/Views/Acesso/CadastroGrupoPermissao.cshtml
+END
+AssociaUsuarioFilialLoja.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/wpdgvm-onion/!svn/ver/500/GLJ/Site/GLJ/Views/Acesso/AssociaUsuarioFilialLoja.cshtml
+END
+ConsultarUsuario.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/wpdgvm-onion/!svn/ver/669/GLJ/Site/GLJ/Views/Acesso/ConsultarUsuario.cshtml
+END

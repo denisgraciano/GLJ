@@ -1,0 +1,251 @@
+﻿@model GLJ.Models.Pedido.PDPedido
+@using MVC.Controls
+@using MVC.Controls.Grid
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#subTotal').setMask();
+        $('#totalPedido').setMask();
+        $('#desc').setMask();
+
+        if ($("#txt_CodigoPedido").val() != 0) {
+            CarregaPedido();
+        }
+
+
+        $(function () {
+            $.post('@Url.Action("CalculaPeriodoEntrega", "Pedido")', function (retorno) {
+                $("#DtEnt").datepicker({ minDate: retorno.Data.DtEnt, defaultDate: retorno.Data.Periodo, dateFormat: 'dd/mm/yy' });
+            });
+        });
+
+        //Salvar dados
+        $("#formPedido").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    if (data.Data.Popup == 1) {
+                        $("#popupAutorizacao").dialog('open');
+                    }
+                    else {
+                        //Abilitar ABA pagamento
+                        $('#tabs').tabs('enable', 1);
+                        $('#tabs').tabs('select', 1);
+
+                        //Preencher os valores para pagamento
+                        PreencherDadosPagamento(data.Data);
+
+                    }
+
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+
+        $('#desc').blur(function () {
+            $.post('@Url.Action("CalculaDesconto", "Pedido")', { VlrDesc: $('#desc').val()}, function (retorno) {
+                $('#subTotal').val(retorno.Data.SubTotal);
+                $('#totalPedido').val(retorno.Data.TotalPedido);
+            });
+        });
+
+        $("#popupAutorizacao").dialog({ autoOpen: false, modal: true, resizable: false, height: 300, width: 600 });
+
+        $("#btnCancelarDesconto").click(function () {
+            $("#popupAutorizacao").dialog('close');
+        });
+
+        $("#btnConfirmarDesconto").click(function () {
+            $.post('@Url.Action("ValidaGerente", "Pedido")', { Login: $('#login').val(), Senha: $('#senha').val() }, function (retorno) {
+                if (retorno.Success) {
+                    $('.success').html(retorno.Mensage);
+                    $('.success').show();
+
+                    $("#popupAutorizacao").dialog('close');
+
+                    //Abilitar ABA pagamento
+                    $('#tabs').tabs('enable', 1);
+                    $('#tabs').tabs('select', 1);
+
+                    //Preencher os valores para pagamento
+                    PreencherDadosPagamento(retorno.Data);
+
+                }
+                else {
+                    $("#popupAutorizacao").dialog('close');
+                    $('.error').html(retorno.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+
+
+    });
+
+
+
+
+    function CarregaPedido() {
+        $.post('@Url.Action("ObterValores", "Pedido")', { desconto: $('#desc').val() }, function (result) {
+            if (result.Success) {
+                $('#subTotal').val(result.Data.SubTotal);
+                $('#totalPedido').val(result.Data.TotalPedido);
+            }
+            else {
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+
+
+        //        $('#tabs').tabs('enable', 1);
+        //        $('#tabs').tabs('enable', 2);
+        //        $('#tabs').tabs('enable', 3);
+
+
+    }
+
+    function AfterSaveCell(rowid, cellname, value, iRow, iCol) {
+        AtualizarPedido();
+        
+    }
+
+    function AtualizarPedido() {
+        $.post('@Url.Action("ObterValores", "Pedido")', { desconto: $('#desconto').val() }, function (result) {
+            if (result.Success) {
+                $('#subTotal').val(result.Data.SubTotal);
+                $('#totalPedido').val(result.Data.TotalPedido);
+            }
+            else {
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+
+        $('#PedidoProdutoGrid').jqGrid().trigger("reloadGrid");
+    }
+
+
+
+    function AtualizarDesconto() {
+    }
+</script>
+<div class="divTituloPagina">
+    <h3>
+        Dados do Cliente e Produtos</h3>
+</div>
+@using (Ajax.BeginForm("SalvarRascunhoPedido", "Pedido", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { @class = "uniForm", id = "formPedido" }
+        ))
+{
+    <div class="ctrlHolder">
+        @Html.HiddenFor(m => m.Pedido.Codigo, new { id = "txt_CodigoPedido" })
+        @Html.LabelFor(m => m.Pedido.NumeroPedido)
+        @Html.TextBoxFor(m => m.Pedido.NumeroPedido, new { @class = "textInput", style = "width: 50%", id = "txtNumeroPedido", placeholder = Html.PlaceHolder(m => m.Pedido.NumeroPedido), disabled = "disabeld" })
+        <p class="formHint">
+            @Html.ValidationMessageFor(m => m.Pedido.NumeroPedido)</p>
+        <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.Pedido.NumeroPedido)" alt=""  />
+    </div>
+    
+    @Html.Partial("_Cliente")
+    @Html.Partial("_Produto")
+
+
+    <div id="grid">
+        @Html.Grid(new GridControl()
+        .SetName("PedidoProdutoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(Url.Content("~/Pedido/BuscarProduto/"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Pedido.GridPedidoModel.BEPedidoDetalheColumns)
+        .SetAdditionalAttributes(",cellsubmit: 'remote', cellEdit: true,cellurl: '" + Url.Content("~/Pedido/EditarQuantidade") + "',afterSaveCell : AfterSaveCell")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                 .ShowDel(true, deleteUrl: Url.Content("~/Pedido/DeletarProdutoPedido"))
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+         ))
+    </div>
+   
+    
+    <div id="divTotalPedido">
+        <div class="divTituloPagina">
+            <h3>
+                Total Pedido</h3>
+        </div>
+        <fieldset class="inlineLabels">
+            <div class="ctrlHolder">
+                @Html.Label("Sub Total :") @Html.TextBox("subTotal", null, new { id = "subTotal", alt = "decimal", @class = "textInput", disabled = "disabled", style = "width: 10%" })
+            </div>
+            <div class="ctrlHolder">
+                @Html.Label("Desconto :")
+                @Html.TextBoxFor(m => m.Pedido.Desconto, new { id = "desc", alt = "decimal", @class = "textInput", style = "width: 10%" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Valor em Reais" alt=""  />
+            </div>
+            <div class="ctrlHolder">
+                @Html.Label("Total Pedido :") @Html.TextBox("totalPedido", null, new { id = "totalPedido", alt = "decimal", @class = "textInput", disabled = "disabled", style = "width: 10%" })
+            </div>
+        </fieldset>
+    </div>
+    <div class="line">
+    </div>
+    <div id="divEntrega">
+        <div class="divTituloPagina">
+            <h3>
+                Entrega</h3>
+        </div>
+        <fieldset class="inlineLabels">
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Pedido.DataEntrega)
+                @Html.TextBoxFor(m => m.Pedido.DataEntrega, new { id = "DtEnt", @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Data de Entrega do Pedido." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Pedido.DataEntrega)</p>
+            </div>
+        </fieldset>
+    </div>
+    @Html.HiddenFor(m => m.Pedido.Codigo)
+    <div class="buttonHolder">
+        <input type="submit" class="primaryAction" value="Continuar" />
+        <div class="secondaryAction">
+            @Html.ActionLink("Cancelar", "CancelarPedido", "Pedido")
+        </div>
+    </div>
+}
+<div id="popupAutorizacao" title="Autoriza Desconto">
+    <fieldset>
+        @Html.ValidationSummary(true)
+        <div class="popupForm">
+            @Html.LabelFor(m => m.Usuario.Login)
+            @Html.TextBoxFor(m => m.Usuario.Login, new { @class = "textInput", id = "login", style = "width: 50% !important;height:25px", placeholder = Html.PlaceHolder(m => m.Usuario.Login) })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o usuário(e-mail)." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.Login)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(m => m.Usuario.Senha)
+            @Html.TextBoxFor(m => m.Usuario.Senha, new { @class = "textInput", id = "senha", placeholder = Html.PlaceHolder(m => m.Usuario.Senha), type = "password", style = "width: 50%; !important;height:25px" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a senha." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.Senha)</p>
+        </div>
+        <div class="buttonAction">
+            <input type="button" class="primaryAction" value="Confirmar" id="btnConfirmarDesconto" />
+            <input type="button" class="primaryAction" value="Cancelar" id="btnCancelarDesconto" />
+        </div>
+    </fieldset>
+</div>

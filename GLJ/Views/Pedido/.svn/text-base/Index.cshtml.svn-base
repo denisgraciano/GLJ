@@ -1,0 +1,37 @@
+﻿@model GLJ.Models.Pedido.PDPedido
+@{
+    ViewBag.Title = "Pedido";
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#tabs').tabs({
+            select: function (event, ui) {
+                if (ui.index == 2) {
+                    CarregarEntrega();
+                }
+            }
+        });
+        $(':input[type="text"]').focus(function () {
+            $(this).val('');
+        });
+
+        $(':input[type="text"]').bind('keypress', function (e) {
+            disableEnterKey(e);
+        });
+
+        $("#tabs").tabs("option", "disabled", [1, 2, 3]);
+        //enabled
+    })
+</script>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabPedido">Pedido</a></li>
+        <li><a href="#tabPagamento">Pagamento</a></li>
+        <li><a href="#tabEntrega">Entrega</a></li>
+        <li><a href="#tabFinalizar">Finalizar</a></li>
+    </ul>
+    <div id="tabPedido">@Html.Partial("_Pedido", Model)</div>
+    <div id="tabPagamento">@Html.Partial("_Pagamento")</div>
+    <div id="tabEntrega">@Html.Partial("_Entrega",Model.Agenda)</div>
+    <div id="tabFinalizar">@Html.Partial("_Finalizar")</div>
+</div>

@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using GLJ.Business.Process;
+using GLJ.Models.Agenda;
+using GLJ.Filter.Entity;
+using GLJ.Business.Entity;
+
+namespace GLJ.Models.BPFacade
+{
+    public class BPFAgendaEntrega : Onion.Business.Singleton<BPAgendaEntrega>
+    {
+        public List<AgendaModelo> ObterAgendaPedidos(FEAgendaEntrega feAgendaEntrega)
+        {
+            List<AgendaModelo> listaAgenda = new List<AgendaModelo>();
+            feAgendaEntrega.LoadType = Onion.Business.Entity.LoadType.Medium;
+
+            List<BEAgendaEntrega> listAgenda = Instance.ObterTodos(feAgendaEntrega).ResultList;
+            foreach (BEAgendaEntrega item in listAgenda)
+            {
+                listaAgenda.Add(new AgendaModelo()
+                {
+                    Pedido = item.Pedido,
+                    title = item.Descricao,
+                    allDay = false,
+                    editable = true,
+                    StatusAgenda = item.StatusAgenda,
+                    id = item.Codigo,
+                    start = item.DataInicio.ToString("s"),
+                    end = item.DataFim.ToString("s"),
+                    nameImageTitle = "delivery.png"
+                });
+            }
+
+            return listaAgenda;
+        }
+
+        internal BEAgendaEntrega AlterarDataEntrega(FEAgendaEntrega feAgendaEntrega,DateTime dataEntrega)
+        {
+            if (dataEntrega.DayOfWeek == DayOfWeek.Saturday || dataEntrega.DayOfWeek == DayOfWeek.Sunday)
+            {
+                throw new Exception("Escolha outra data");
+            }
+
+            BEAgendaEntrega beAgendaEntregaOld = Instance.ObterTodos(feAgendaEntrega).ResultList.SingleOrDefault();
+            BEAgendaEntrega beAgendaEntrega = beAgendaEntregaOld.Clone() as BEAgendaEntrega;
+            beAgendaEntrega.DataInicio = dataEntrega;
+            beAgendaEntrega.DataFim = dataEntrega;
+            beAgendaEntrega = (BEAgendaEntrega)beAgendaEntregaOld.AlterProperties(beAgendaEntrega);
+            return Instance.Salvar(beAgendaEntrega);
+        }
+
+        internal BEAgendaEntrega Salvar(BEAgendaEntrega beAgendaEntrega)
+        {
+            //Verificar a Possibilidade de pegar isso da configuração do cliente
+            //Adicionando 20 dias apartir da data de hoje
+            beAgendaEntrega.DataInicio = RetornarDataSemFimDeSemana(DateTime.Now.AddDays(20));
+            beAgendaEntrega.DataFim = RetornarDataSemFimDeSemana(DateTime.Now.AddDays(20));
+
+            if(beAgendaEntrega.Codigo >0 )
+            {
+                BEAgendaEntrega agendaOld = Instance.ObterTodos(new FEAgendaEntrega{Codigo = beAgendaEntrega.Codigo,CodigoPedido = beAgendaEntrega.Codigo}).ResultList.FirstOrDefault();
+                beAgendaEntrega = (BEAgendaEntrega)agendaOld.AlterProperties(beAgendaEntrega);
+            }
+            return Instance.Salvar(beAgendaEntrega);
+        }
+
+        private DateTime RetornarDataSemFimDeSemana(DateTime dataEntrega)
+        {
+            DayOfWeek diasDaSemana = dataEntrega.DayOfWeek;
+            if (diasDaSemana == DayOfWeek.Saturday)
+            {
+                dataEntrega = dataEntrega.AddDays(2);
+            }
+            else if (diasDaSemana == DayOfWeek.Sunday)
+            {
+                dataEntrega = dataEntrega.AddDays(1);
+            }
+
+            return dataEntrega;
+        }
+    }
+}

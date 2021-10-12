@@ -1,0 +1,44 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using GLJ.Business.Process;
+using Onion.Business;
+using GLJ.Business.Entity;
+using GLJ.Models.Pedido;
+using GLJ.Filter.Entity;
+
+namespace GLJ.Models.BPFacade
+{
+    public class BPFPedido : Singleton<BPPedido>
+    {
+        internal PDPedido ObterPedido(FEPedido fePedido)
+        {
+            PDPedido pedido = new PDPedido();
+            pedido.Pedido = Instance.ObterTodos(fePedido).ResultList.SingleOrDefault();
+            return pedido;
+        }
+
+        internal PDPedido SalvarPedido(PDPedido pedido)
+        {
+            //Alterar Pedido
+            if (pedido.Pedido.Codigo > 0)
+            {
+                BEPedido bePedidoOld = Instance.ObterTodos(new FEPedido() { Codigo = pedido.Pedido.Codigo,CodigoCliente = pedido.Pedido.CodigoCliente,CodigoLoja = pedido.Pedido.CodigoLoja,CodigoLojaFilial = pedido.Pedido.CodigoFilialLoja }).ResultList.FirstOrDefault();
+                pedido.Pedido = (BEPedido)bePedidoOld.AlterProperties(pedido.Pedido);
+            }
+
+            pedido.Pedido  = Instance.Salvar(pedido.Pedido,pedido.PagamentosPedido);
+
+            pedido.Agenda.AgendaEntrega.StatusAgenda = StatusAgendaEntrega.ATIVA;
+            pedido.Agenda.AgendaEntrega.CodigoPedido = pedido.Pedido.Codigo;
+
+            //Salvar Agenda e a descrição para mostrar na tela
+            BECliente cliente = BPFCliente.Instance.ObterTodos(new FECliente { Codigo = pedido.Pedido.CodigoCliente, CodigoLoja = pedido.Pedido.CodigoLoja }).ResultList.FirstOrDefault();
+            pedido.Agenda.AgendaEntrega.Descricao = string.Format("Pedido: {0} - Cliente : {1}", pedido.Pedido.Codigo, cliente.Nome);
+            pedido.Agenda.AgendaEntrega = new BPFAgendaEntrega().Salvar(pedido.Agenda.AgendaEntrega);
+
+            return pedido;
+        }
+    }
+}

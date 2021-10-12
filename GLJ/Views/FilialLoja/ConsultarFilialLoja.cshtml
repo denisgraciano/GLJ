@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Consulta de Filial da Loja";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.FilialLoja.PDFilialLoja
+<div class="divTituloPagina">
+    <h3>@ViewBag.Title</h3>
+</div>
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarFilialLoja", "FilialLoja", FormMethod.Post, new { id = "formBuscarFilalLoja", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEFilialLoja.Nome)
+                    @Html.TextBoxFor(m => m.FEFilialLoja.Nome, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome da Filial" alt="" />
+                </div>
+                
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("FilialLojaGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/FilialLoja/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.FilialLoja.GridFilialLojaModel.BEFilialLojaColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(true, true)
+        ))
+</div>
+<div>
+    <p>@Html.ActionLink("Cadastrar Nova Filial Loja", "CadastroFilialLoja")
+    </p>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarFilalLoja").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#FilialLojaGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + '@Url.Content("~/FilialLoja/CadastroFilialLoja/")' + $("#FilialLojaGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

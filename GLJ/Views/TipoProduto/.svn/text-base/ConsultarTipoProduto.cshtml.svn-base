@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Consulta do Tipo de Produto";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.TipoProduto.PDTipoProduto
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarTipoProduto", "TipoProduto", FormMethod.Post, new { id = "formBuscarTipoProduto", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FETipoProduto.Descricao)
+                    @Html.TextBoxFor(m => m.FETipoProduto.Descricao, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a descrição do Tipo de Produto" alt="" />
+                </div>
+                
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("TipoProdutoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/TipoProduto/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.TipoProduto.GridTipoProdutoModel.BETipoProdutoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(true, true)
+        ))
+</div>
+<div>
+    <p>@Html.ActionLink("Cadastrar Novo Tipo de Produto", "CadastroTipoProduto")
+    </p>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarTipoProduto").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#TipoProdutoGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + "/TipoProduto/CadastroTipoProduto/" + $("#TipoProdutoGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

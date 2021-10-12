@@ -1,0 +1,54 @@
+﻿@model GLJ.Business.Entity.BEPagamentoDinheiro
+<div class="divTituloPagina">
+    <h3>
+        Pagamento com dinheiro</h3>
+</div>
+@using (Ajax.BeginForm("AdicionarPagamentoDinheiro", "Pedido", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { @class = "uniForm", id = "formPagamentoDinheiro" }
+        ))
+{
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.ValorPagamento)
+            @Html.TextBoxFor(m => m.ValorPagamento, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.ValorPagamento), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.ValorPagamento)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.ValorPagamento)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar Pagamento com Dinheiro"
+                title="Adicionar Pagamento com Dinheiro" />
+        </div>
+    </fieldset>
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //Salvar dados
+        $("#formPagamentoDinheiro").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    //Atualizar os valores de pagamento
+                    PreencherDadosPagamento(data.Data);
+
+                    $("#cmbTipoPagamento").selectOptions("");
+                    $("#formPagamentoDinheiro").reset();
+                    $('#divCash').hide();
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>

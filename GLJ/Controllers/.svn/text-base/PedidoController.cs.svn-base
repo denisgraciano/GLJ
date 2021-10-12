@@ -1,0 +1,195 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using GLJ.Models.Pedido;
+using MVC.Controls;
+using MVC.Controls.Grid;
+using GLJ.Business.Entity;
+using GLJ.Models.BPFacade;
+using GLJ.Filter.Entity;
+using GLJ.Acesso.Filter.Entity;
+using GLJ.Acesso.Business.Entity;
+
+namespace GLJ.Controllers
+{
+    public class PedidoController : PagamentoController
+    {
+        #region Métodos de Chamada
+        //[AuthorizeOnion]
+        public ActionResult Index(Int32? codigoPedido)
+        {
+            if (!codigoPedido.HasValue)
+            {
+                Session.Remove("Pedido");
+                BEVendedor beVendedor = BPFVendedor.Instance.ObterTodos(new FEVendedor { CodigoUsuario = UsuarioLogin.Codigo,CodigoLoja = UsuarioLogin.CodigoLoja }).ResultList.FirstOrDefault();
+                if (beVendedor == null)
+                    base.AdicionarMensagemAtencao("Usuário logado não é vendedor, por favor verifique sua permissão");
+                else{
+                    this.ProcessData.Pedido.CodigoVendedor = beVendedor.Codigo;
+                    this.ProcessData.Pedido.CodigoLoja = beVendedor.CodigoLoja;
+
+                    //TODO: Validar com o combo Selecionado
+                    this.ProcessData.Pedido.CodigoFilialLoja = (int)UsuarioLogin.CodigoFilialLoja;
+                }
+
+                this.ProcessData.Pedido.DataCompra = DateTime.Now;
+
+                Session["Pedido"] = this.ProcessData;
+            }
+            else
+            {
+                FEPedido fePedido = new FEPedido();
+                fePedido.CodigoLoja = UsuarioLogin.Loja.Codigo;
+                fePedido.Codigo = codigoPedido.GetValueOrDefault();
+                this.ProcessData = new BPFPedido().ObterPedido(fePedido);
+            }
+
+            var listTipo = Onion.Util.EnumHelper.GetDescriptions<TipoPagamento>();
+            TempData["TiposPagamento"] = new SelectList(listTipo, "Value", "Name");
+
+             this.ProcessData.Pedido.NumeroPedido = BPFPedido.Instance.NumPedido((int)UsuarioLogin.CodigoFilialLoja, UsuarioLogin.CodigoLoja);
+
+
+            return View(this.ProcessData);
+        }
+        #endregion
+
+        #region Metodos Especificos
+        [HttpGet]
+        public JsonResult BuscarProduto(SearchModel searchModel)
+        {
+            IQueryable<BEPedidoDetalhe> model = ((PDPedido)Session["Pedido"]).Pedido.PedidoDetalhe.AsQueryable();
+            GridData gridData = model.ToGridData(searchModel, GridPedidoModel.BEPedidoDetalheColumns);
+            return Json(gridData, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult AdicionarProduto(Int32 Codigo)
+        {
+            this.ProcessData = (PDPedido)Session["Pedido"];
+            if (this.ProcessData.Pedido.PedidoDetalhe.FirstOrDefault(prop => prop.CodigoProduto == Codigo) == null)
+            {
+                BEProduto produto = BPFProduto.Instance.ObterTodos(new FEProduto() { Codigo = Codigo, CodigoLoja = 1, LoadType = Onion.Business.Entity.LoadType.Medium }).ResultList.SingleOrDefault();
+                this.ProcessData.Pedido.PedidoDetalhe.Add(new BEPedidoDetalhe()
+                {
+                    Produto = produto,
+                    ValorTotalProduto = produto.Preco.PrecoVenda,
+                    QuantidadeProduto = 1,
+                });
+                return Json(new JsonReturn(true));
+            }
+            else
+            {
+                return Json(new JsonReturn(false, "Já existe este item na lista"));
+            }
+        }
+
+        [HttpPost]
+        public JsonResult EditarQuantidade(Int32 CodigoProduto, Int32 QuantidadeProduto, string oper)
+        {
+            this.ProcessData = (PDPedido)Session["Pedido"];
+            BEPedidoDetalhe pedidoDetalhe = this.ProcessData.Pedido.PedidoDetalhe.FirstOrDefault(prop => prop.CodigoProduto == CodigoProduto);
+            pedidoDetalhe.QuantidadeProduto = QuantidadeProduto;
+            pedidoDetalhe.ValorTotalProduto = pedidoDetalhe.Produto.Preco.PrecoVenda * QuantidadeProduto;
+            return Json(true);
+        }
+
+        [HttpPost]
+        public JsonResult ObterValores(decimal? desconto)
+        {
+            this.ProcessData = (PDPedido)Session["Pedido"];
+            decimal? valorTotal = this.ProcessData.Pedido.PedidoDetalhe.Sum(p => p.ValorTotalProduto);
+
+            return Json(new JsonReturn(true, "", new { SubTotal = valorTotal, TotalPedido = valorTotal }));
+        }
+
+        /// <summary>
+        /// Salvar Rascunho pedido ABA 1 (Adiconar Cliente )
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult SalvarRascunhoPedido(PDPedido model)
+        {
+            this.ProcessData = (PDPedido)Session["Pedido"];
+            try
+            {               
+                if (!this.ProcessData.ValorTotal.HasValue)
+                {
+                    if (string.IsNullOrWhiteSpace(this.ProcessData.Pedido.NumeroPedido))
+                    {
+                        return Json(new JsonReturn(false, "Informe o número do pedido na loja."));
+                    }
+
+                    if (model.Pedido.CodigoCliente == 0)
+                    {
+                        return Json(new JsonReturn(false, "Selecione um cliente."));
+                    }
+
+                    if (this.ProcessData.Pedido.PedidoDetalhe.Count == 0)
+                    {
+                        return Json(new JsonReturn(false, "Selecione um produto para continuar."));
+                    }
+
+                    this.ProcessData.Pedido.CodigoCliente = model.Pedido.CodigoCliente;
+                    this.ProcessData.TotalItens = this.ProcessData.Pedido.PedidoDetalhe.Count;
+                    this.ProcessData.ValorTotal = this.ProcessData.Pedido.PedidoDetalhe.Sum(p => p.ValorTotalProduto);
+                    this.ProcessData.ValorRestantePagamento = this.ProcessData.ValorTotal;
+
+                }
+
+                return Json(new JsonReturn
+                {
+                    Success = true,
+                    Mensage = "Pedido aguardando complemento das informações",
+                    Data = new
+                        {
+                            TotalItens = this.ProcessData.TotalItens,
+                            ValorTotal = this.ProcessData.ValorTotal,
+                            ValorRestantePagamento = this.ProcessData.ValorRestantePagamento,
+                        }
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new JsonReturn(false, ex.Message));
+            }
+        }
+
+        [HttpPost]
+        public JsonResult SalvarAprovacao()
+        {
+            try
+            {
+                this.ProcessData = (PDPedido)Session["Pedido"];                
+                this.ProcessData.Pedido.StatusPedido = StatusPedido.APROVACAO;
+                Session["Pedido"] = new BPFPedido().SalvarPedido(this.ProcessData);
+                return Json(new JsonReturn(true,"Verifique a data de entrega"));
+            }
+            catch (Exception ex)
+            {
+                return Json(new JsonReturn(false,ex.Message));
+            }
+        }
+
+        [HttpPost]
+        public JsonResult Finalizar()
+        {
+            try
+            {
+                this.ProcessData = (PDPedido)Session["Pedido"];
+                this.ProcessData.Pedido.StatusPedido = StatusPedido.APROVACAO;
+                return Json(new JsonReturn(true, "Verifique as informações do pedido",this.ProcessData));
+            }
+            catch (Exception ex)
+            {
+                return Json(new JsonReturn(false, ex.Message));
+            }
+        }
+       
+        #endregion
+
+    }
+}

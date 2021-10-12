@@ -1,0 +1,10 @@
+﻿@{
+    ViewBag.Title = "Vendedor";
+}
+<fieldset style="padding-top=15px">
+<ul>
+    <li>@Html.ActionLink("Consultar Vendedor", "ConsultarVendedor")</li>
+    <li>@Html.ActionLink("Cadastrar Novo Vendedor", "CadastroVendedor")</li>
+</ul>
+
+</fieldset>

@@ -1,0 +1,90 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Pedido.PDPedido
+@{
+    ViewBag.Title = "Observação Pedido";
+}
+@using (Html.BeginForm("SalvarObservacao", "Pedido", FormMethod.Post, new { enctype = "multipart/form-data", id = "formDetPedido", @class = "uniForm" }))
+{
+      <div class="divTituloPagina">
+        <h3>@ViewBag.Title</h3>
+    </div>
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.PedidoObservacao.Codigo)
+        @Html.HiddenFor(m => m.Pedido.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Pedido.NumeroPedido)
+            @Html.TextBoxFor(m => m.Pedido.NumeroPedido, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Pedido.Cliente.Nome)
+            @Html.TextBoxFor(m => m.Pedido.Cliente.Nome, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Pedido.DataEntrega)
+            @Html.TextBoxFor(m => m.Pedido.DataEntrega, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.PedidoObservacao.Descricao)
+            @Html.TextAreaFor(m => m.PedidoObservacao.Descricao, new { @class = "textInput" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.PedidoObservacao.Descricao)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar"  />
+        </div>
+    </fieldset>
+}
+<div id="divTabela">
+    @Html.Grid(new GridControl()
+        .SetName("gridPedidoObservacao")
+        .SetPageSize(20)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(string.Format(Url.Content("~/Pedido/ObterPedidoObservacao/?codigoPedido={0}"), Model.Pedido.Codigo))
+        .SetAdditionalAttributes(",ondblClickRow:doubleClickProdutoItem")
+        .SetHeight("200")
+        .SetWidth("1000")
+        .UseColumns(GLJ.Models.Pedido.GridPedidoModel.BEPedidoObservacaoColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>
+<div class="secondaryAction">
+    @Html.ActionLink("Finalizar Observação", "ConsultarPedido")
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+    });
+
+    function doubleClickProdutoItem(rowid, iRow, iCol, e) {
+        var contato = $("#gridContato").getRowData(rowid);
+
+        $("[name='Contato.Codigo']").val(contato.Codigo);
+        $("[name='Contato.Nome']").val(contato.Nome);
+        $("[name='Contato.Email']").val(contato.Email);
+        $("[name='Contato.Fone']").val(contato.Fone);
+        $("[name='Contato.FAX']").val(contato.FAX);
+        $("[name='Contato.CEL']").val(contato.CEL);
+    }
+
+    function Salvar() {
+        $.post('@Url.Action("SalvarObservacao", "Pedido")', null, function (data) {
+            if (data.Success) {
+
+                $('.success').html(data.Mensage);
+                $('.success').show();
+
+            }
+            else {
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+    }
+</script>
+

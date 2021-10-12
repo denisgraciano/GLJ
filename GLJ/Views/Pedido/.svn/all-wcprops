@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido
+END
+Index.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido/Index.cshtml
+END
+_Pagamento.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido/_Pagamento.cshtml
+END
+_Produto.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/wpdgvm-onion/!svn/ver/547/GLJ/Site/GLJ/Views/Pedido/_Produto.cshtml
+END
+_Finalizar.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido/_Finalizar.cshtml
+END
+_Cliente.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido/_Cliente.cshtml
+END
+_Pedido.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido/_Pedido.cshtml
+END
+_PagamentoDinhero.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/wpdgvm-onion/!svn/ver/708/GLJ/Site/GLJ/Views/Pedido/_PagamentoDinhero.cshtml
+END
+_Entrega.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/wpdgvm-onion/!svn/ver/711/GLJ/Site/GLJ/Views/Pedido/_Entrega.cshtml
+END
+_PagamentoCartao.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/wpdgvm-onion/!svn/ver/694/GLJ/Site/GLJ/Views/Pedido/_PagamentoCartao.cshtml
+END
+_PagamentoCheque.cshtml
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/wpdgvm-onion/!svn/ver/694/GLJ/Site/GLJ/Views/Pedido/_PagamentoCheque.cshtml
+END

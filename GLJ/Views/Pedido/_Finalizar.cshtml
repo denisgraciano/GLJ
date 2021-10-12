@@ -1,0 +1,41 @@
+﻿@model GLJ.Models.Pedido.PDPedido
+<div id="divResumo">
+    <div class="divTituloPagina">
+        <h3>
+            Resumo do Pedido</h3>
+    </div>
+</div>
+<div class="line">
+</div>
+@using (Ajax.BeginForm("ImpressaoPedido", "Pedido", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm", id = "formImprimiPedido" }
+        ))
+{
+    <div class="uniForm">
+        <fieldset class="inlineLabels">
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Pedido.NumeroPedido)
+                @Html.TextBoxFor(m => m.Pedido.NumeroPedido, new { @class = "textInput", style = "width: 50%", id = "txtNumeroPedido", placeholder = Html.PlaceHolder(m => m.Pedido.NumeroPedido), disabled = "disabeld" })
+            </div>
+            <div class="ctrlHolder">
+                @Html.Label("Data de Entrega")
+                @Html.TextBoxFor(m => m.Pedido.DataEntrega, new { @class = "textInput", style = "width: 50%", id = "txtNomeClientePedido", disabled = "disabeld" })
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Pedido.InformacaoAdicional)
+                @Html.TextAreaFor(m => m.Pedido.InformacaoAdicional, new { @class = "textInput", placeholder = Html.PlaceHolder(p => p.Pedido.InformacaoAdicional) })
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Pedido.InformacaoAdicional)</p>
+            </div>            
+            <div class="buttonHolder">
+                <input type="submit" class="primaryAction" value="Finalizar" />
+                <div class="secondaryAction">
+                    @Html.ActionLink("Cancelar", "CancelarPedido", "Pedido")
+                </div>
+            </div>
+        </fieldset>
+    </div>
+}

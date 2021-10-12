@@ -1,0 +1,114 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Acesso.PDAcesso
+@{
+    ViewBag.Title = "Cadastro de Usuários";
+}
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+}
+@using (Ajax.BeginForm("SalvarUsuario", "Acesso", new AjaxOptions()
+    {
+        HttpMethod = "Post",
+        OnSuccess = "success"
+    }, new { enctype = "multipart/form-data", @class = "uniForm",id="formUsuario" }
+    ))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        <h3>
+            Assistência Técnica - Cadastro de Usuários</h3>
+        @Html.HiddenFor(m => m.Usuario.Codigo, new { id = "Codigo" })
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Usuario.NomeUsuario)
+            @Html.TextBoxFor(m => m.Usuario.NomeUsuario, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome do Usuário." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.NomeUsuario)</p>
+        </div>        
+       
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Usuario.Login)
+            @Html.TextBoxFor(m => m.Usuario.Login, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Login." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.Login)</p>
+        </div>
+        <div class="ctrlHolder" >
+            @Html.LabelFor(m => m.Usuario.Senha)
+            @Html.TextBoxFor(m => m.Usuario.Senha, new { @class = "textInput", placeholder = "Senha", type = "password" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe uma Senha." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.Senha)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Usuario.Gerente)
+            @Html.TextBoxFor(m => m.Usuario.Gerente, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe se o Usuário tem permissões de Gerente." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.Gerente)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Usuario.ExpiraSenha)
+            @Html.CheckBoxFor(m => m.Usuario.ExpiraSenha, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe se deve expirar a senha no Próximo Logon." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.ExpiraSenha)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Usuario.Ativo)
+            @Html.CheckBoxFor(m => m.Usuario.Ativo, new { @class = "textInput" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Usuario.Ativo)</p>
+        </div>
+
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.UsuarioGrupo.GrupoPermisao.Descricao)
+            @Html.DropDownListFor(m => m.UsuarioGrupo.CodigoGrupoPermissao, TempData["Grupos"] as IEnumerable<SelectListItem>, "Selecione um Grupo de Permissão", new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Selecione um Grupo de Permissão." alt="" />            
+            <img src="../Content/img/Add.png" id="imgAdicionarGrupo" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.UsuarioGrupo.CodigoGrupoPermissao)</p>
+        </div>
+
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("gridUsuarioGrupo")
+        .SetPageSize(15)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(string.Format(Url.Content("~/Acesso/ObterUsuarioGrupo/?codigoUsuario={0}"), (Model != null ? Model.Usuario.Codigo : 0)))
+        .SetHeight("'100%'")
+        .SetIsAutoSize(true)
+        .UseColumns(GLJ.Models.Acesso.GridUsuarioModel.BEUsuarioGrupoColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(true, deleteUrl: Url.Content("~/Acesso/DeletarUsuarioGrupoPermissao"))
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>
+<script type='text/javascript'>
+    $(document).ready(function () {
+
+        $('#imgAdicionarGrupo').click(function () {
+            $.post(url + '@Url.Content("~/Acesso/AdicionarGrupo")', $('#formUsuario').serialize(), function (data) {
+                if (data.Success) {
+                    $('#gridUsuarioGrupo').jqGrid().trigger("reloadGrid");
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>

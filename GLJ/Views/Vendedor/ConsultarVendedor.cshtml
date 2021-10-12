@@ -1,0 +1,67 @@
+﻿@{
+    ViewBag.Title = "Consultar Vendedor";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Vendedor.PDVendedor
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarVendedor", "Vendedor", FormMethod.Post, new { id = "formBuscarVendedor", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.Label("Vendedor")
+                    @Html.DropDownListFor(m => m.FEVendedor.CodigoUsuario, TempData["Usuarios"] as IEnumerable<SelectListItem>, "Selecione um Vendedor", new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Vendedor" alt="" />
+                </div>
+                
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("VendedorGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Vendedor/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Vendedor.GridVendedorModel.BEVendedorColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+</div>
+<div class="buttonAction">
+   @Html.ActionLink("Cadastrar Novo Vendedor", "CadastroVendedor", null, new { @class = "primaryAction" })   
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarVendedor").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#VendedorGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + '@Url.Content("~/Vendedor/CadastroVendedor/")' + $("#VendedorGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

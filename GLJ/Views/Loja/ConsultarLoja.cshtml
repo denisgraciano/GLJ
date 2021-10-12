@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Consultar Loja";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Loja.PDCadastroLoja
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+}
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarLoja", "Loja", FormMethod.Post, new { id = "formBuscarLoja", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FELoja.Nome)
+                    @Html.TextBoxFor(m => m.FELoja.Nome, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome Fantasia." alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FELoja.Cnpj)
+                    @Html.TextBoxFor(m => m.FELoja.Cnpj, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ." alt="" />
+                </div>
+                @Html.Partial("_EstadoCidade", Model)
+@*                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FELoja.Ativo)
+                    @Html.CheckBoxFor(m => m.FELoja.Ativo, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ." alt="" />
+                </div>*@
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("LojaGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Loja/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Loja.GridLojaModel.BELojaColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(true, true)
+        ))
+</div>
+<div>
+    <p>@Html.ActionLink("Cadastrar Nova Loja", "CadastroLoja")
+    </p>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Setar o nome do controle de Cidade
+        $('#cmbEstado').attr('name', 'FELoja.UF');
+        $('#cmbCidade').attr('name', 'FELoja.CodigoCidade');
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarLoja").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#LojaGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + "/Loja/CadastroLoja/" + $("#LojaGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

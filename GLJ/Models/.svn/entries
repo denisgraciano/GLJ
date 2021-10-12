@@ -1,0 +1,144 @@
+10
+
+dir
+712
+https://subversion.assembla.com/svn/wpdgvm-onion/GLJ/Site/GLJ/Models
+https://subversion.assembla.com/svn/wpdgvm-onion
+
+
+
+2012-03-04T20:58:17.735359Z
+711
+wseara
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+f8c9096f-6e2a-4a4d-a7cb-9237e33dd8ac
+
+Agenda
+dir
+
+Cliente
+dir
+
+Estoque
+dir
+
+Loja
+dir
+
+BPFacade
+dir
+
+Fornecedor
+dir
+
+OnionHelper.cs
+file
+
+
+
+
+2012-02-17T23:37:04.668899Z
+b2dc76f9ff009ee2bd390c3f619ac218
+2012-02-21T22:46:08.726558Z
+697
+denisgraciano
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3922
+
+TipoProduto
+dir
+
+Produto
+dir
+
+Configuracao
+dir
+
+Utils.cs
+file
+
+
+
+
+2012-02-17T23:25:49.323272Z
+f7f218a6d9aa13222700452f2dabcde4
+2011-11-30T03:46:40.165055Z
+459
+denisgraciano
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2349
+
+Pedido
+dir
+
+Vendedor
+dir
+
+FilialLoja
+dir
+
+Preco
+dir
+
+ProcessData
+dir
+
+Login
+dir
+
+Acesso
+dir
+

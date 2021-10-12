@@ -1,0 +1,12 @@
+﻿
+@using (Ajax.BeginForm("PesquisaTopo",null, new AjaxOptions()
+        {
+            HttpMethod = "Post",
+        }, new { enctype = "multipart/form-data", @class = "uniForm", id = "formCliente" }
+        ))
+{
+@*<p>
+    @Html.TextBox("txtPesquisa", null, new { @class="searchfield",placeholder="Busca Rápida"})        
+    <input class="searchbutton" type="submit" value="Pesquisar" name="submit" >
+</p>*@
+}

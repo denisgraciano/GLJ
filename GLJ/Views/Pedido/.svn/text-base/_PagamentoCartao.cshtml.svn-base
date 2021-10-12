@@ -1,0 +1,68 @@
+﻿@model GLJ.Business.Entity.BEPagamentoCartao
+           <div class="divTituloPagina">
+    <h3>Pagamento com cartão</h3>
+    </div>
+@using (Ajax.BeginForm("AdicionarPagamentoCartao", "Pedido", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new {@class = "uniForm", id = "formPagamentoCartao" }
+))
+{
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.ValorPagamento)
+            @Html.TextBoxFor(m => m.ValorPagamento, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.ValorPagamento), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.ValorPagamento)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.ValorPagamento)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.NumeroParcelas)
+            @Html.TextBoxFor(m => m.NumeroParcelas, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.NumeroParcelas), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.NumeroParcelas)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.NumeroParcelas)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Bandeira)
+            @Html.TextBoxFor(m => m.Bandeira, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.Bandeira), style = "width: 30% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.Bandeira)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Bandeira)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar Pagamento com Cartão" title="Adicionar Pagamento com Cartão" />
+        </div>
+    </fieldset>
+}
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //Salvar dados
+        $("#formPagamentoCartao").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    //Atualizar os valores de pagamento
+                    PreencherDadosPagamento(data.Data);
+
+                    $("#cmbTipoPagamento").selectOptions("");
+                    $("#formPagamentoCartao").reset();
+                    $('#divCartao').hide();
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>

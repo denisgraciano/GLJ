@@ -1,0 +1,138 @@
+﻿@model GLJ.Business.Entity.BEPagamentoCheque
+<div class="divTituloPagina">
+    <h3>
+        Pagamento com cheque</h3>
+</div>
+@using (Ajax.BeginForm("AdicionarPagamentoCheque", "Pedido", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { @class = "uniForm", id = "formPagamentoCheque" }
+        ))
+{
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Banco.NomeBanco)
+            @Html.HiddenFor(m => m.CodigoBanco, new { id = "txtCodBanco" })
+            @Html.TextBox("NomeBanco", null, new { @class = "textInput", style = "width: 35%", id = "txtNomeBanco" })
+            @*@Html.TextBoxFor(m => m.ValorPagamento, new { @class = "textInput",id = "decimal", alt = "decimal", placeholder = Html.PlaceHolder(m => m.ValorPagamento), style = "width: 15% !important" })*@
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.ValorPagamento)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.ValorPagamento)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.AgenciaCheque)
+            @Html.TextBoxFor(m => m.AgenciaCheque, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.AgenciaCheque), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.AgenciaCheque)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.AgenciaCheque)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.ContaCorrenteCheque)
+            @Html.TextBoxFor(m => m.ContaCorrenteCheque, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.ContaCorrenteCheque), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.ContaCorrenteCheque)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.ContaCorrenteCheque)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.NumeroCheque)
+            @Html.TextBoxFor(m => m.NumeroCheque, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.NumeroCheque), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.NumeroCheque)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.NumeroCheque)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.NumeroParcela)
+            @Html.TextBoxFor(m => m.NumeroParcela, new { @class = "textInput", id="NroParc", placeholder = Html.PlaceHolder(m => m.NumeroParcela), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.NumeroParcela)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.NumeroParcela)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DataVenciemnto)
+            @Html.TextBoxFor(m => m.DataVenciemnto, new { @class = "textInput", alt = "date", id = "DataPag", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.DataPagamento)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DataVenciemnto)</p>
+        </div>
+        <div class="ctrlHolder", hidden=true, id="seq">
+            @Html.LabelFor(m => m.Sequecial)
+            @Html.CheckBoxFor(m => m.Sequecial, new { @class = "textInput", style = "width: 15% !important" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Sequecial)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.ValorPagamento)
+            @Html.TextBoxFor(m => m.ValorPagamento, new { @class = "textInput", id = "VlrPagto", alt = "decimal", placeholder = Html.PlaceHolder(m => m.ValorPagamento), style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.ValorPagamento)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.ValorPagamento)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.ValorParcela)
+            @Html.TextBoxFor(m => m.ValorParcela, new { @class = "textInput", id = "VlrParc", alt = "decimal", placeholder = Html.PlaceHolder(m => m.ValorParcela), disabled = "disabled", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.ValorParcela)" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.ValorParcela)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar Pagamento com Cheque"
+                title="Adicionar Pagamento com Cheque" />
+        </div>
+    </fieldset>
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#VlrPagto').setMask();
+        $('#VlrParc').setMask();
+
+        $("#DataPag").datepicker({ dateFormat: 'dd/mm/yy' });
+
+        $('#txtNomeBanco').autocomplete({
+            source: '@Url.Action("AutoCompleteBanco", "Home")',
+            minLength: 3,
+            select: function (e, data) {
+                $('#txtCodBanco').val(data.item.Codigo);
+            }
+        });
+
+        $('#VlrPagto').blur(function () {
+            $.post('@Url.Action("CalculaValorParcela", "Pedido")', { VlrPagamento: $('#VlrPagto').val(), NroParc: $('#NroParc').val() }, function (retorno) {
+                $('#VlrParc').val(retorno.Data.VlrParc);
+            });
+        });
+
+        $('#NroParc').blur(function () {
+            if ($('#NroParc').val() > 1) {
+                $('#seq').show();
+            }
+            else {
+                $('#seq').hide();
+            }
+        });
+
+        $("#formPagamentoCheque").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    //Atualizar os valores de pagamento
+                    PreencherDadosPagamento(data.Data);
+
+                    $("#cmbTipoPagamento").selectOptions("");
+                    $("#formPagamentoCheque").reset();
+                    $('#divCheque').hide();
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>

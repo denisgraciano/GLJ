@@ -1,0 +1,113 @@
+﻿@model GLJ.Models.AssistenciaTecnica.PDAssistenciaTecnica
+@using MVC.Controls
+@using MVC.Controls.Grid
+@{
+    ViewBag.Title = "Cadastro de Assistencia Técnica";
+}
+<script type="text/javascript" language="javascript">
+
+    //carregaCliente($("#txtCodigoCliente").val());
+
+    function carregaCliente() {
+        if ($('#idCliente').val() != '') {
+            $('#detalhesCliente').toggle();
+            return;
+        }
+
+        var html;
+        $.ajax({
+            type: 'GET',
+            url: url + '@Url.Content("~/Cliente/ObterDetalheCliente/?codigoCliente=")' + $("#txtCodigoCliente").val(),
+            success: function (result) {
+                if (result.Success) {
+                    $('#idCliente').val('-1');
+                    html = "<div class='ctrlHolder'><label><b>Endereço</b></label><div class='textInput', style = 'width: 35%'>" + result.Data.Endereco + "</div></div>";
+                    html = html + "<div class='ctrlHolder'><label><b>CEP</b></label><div class='textInput', style = 'width: 15%'>" + result.Data.CEP + "</div></div>";
+                    html = html + "<div class='ctrlHolder'><label><b>Referencia</b></label><div class='textInput', style = 'width: 35%'>" + result.Data.REF + "</div></div>";
+                    $('#detalhesCliente_info').html(html);
+                    $('#detalhesCliente').show();
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            }
+        });
+
+    }
+
+    function AtualizarAssistencia() {
+        $('#AssitenciaProdutoGrid').jqGrid().trigger("reloadGrid");
+    }
+</script>
+<div class="divTituloPagina">
+    <h3>@ViewBag.Title</h3>
+</div>
+@using (Ajax.BeginForm("Salvar", "AssistenciaTecnica", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.AssistenciaTecnica.Codigo)
+        @Html.HiddenFor(m => m.AssistenciaTecnica.CodigoPedido)
+        @Html.HiddenFor(m => m.AssistenciaTecnica.Pedido.CodigoCliente, new { id = "txtCodigoCliente" })
+        @Html.Hidden("idCliente")
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.AssistenciaTecnica.Pedido.NumeroPedido)
+            @Html.TextBoxFor(m => m.AssistenciaTecnica.Pedido.NumeroPedido, new { @class = "textInput", style = "width: 5%", id = "txtCodigoPedido", @readonly = "readonly" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.AssistenciaTecnica.Pedido.Cliente.Nome)
+            @Html.TextBoxFor(m => m.AssistenciaTecnica.Pedido.Cliente.Nome, new { @class = "textInput", style = "width: 35%", id = "txtNomeCliente", @readonly = "readonly" })
+        </div>
+        <div id="cliente">
+            <a href="#" onclick="carregaCliente()"><b>Detalhes do Cliente</b></a>
+            <div id="detalhesCliente" style="display: none">
+                <fieldset style="background-color: rgb(239,239,239)">
+                    <div id="detalhesCliente_info">
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.BEAssistenciaTecnicaDetalhe.Descricao)
+            @Html.TextAreaFor(m => m.BEAssistenciaTecnicaDetalhe.Descricao, new { @class = "textInput", id="txtDescricao" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Descrição." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.BEAssistenciaTecnicaDetalhe.Descricao)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.BEAssistenciaTecnicaDetalhe.Motivo)
+            @Html.TextAreaFor(m => m.Motivo, new { @class = "textInput", id="txtMotivo" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Motivo." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.BEAssistenciaTecnicaDetalhe.Motivo)</p>
+        </div>
+        @Html.Partial("_Produto")
+        <div id="grid">
+            @Html.Grid(new GridControl()
+        .SetName("AssitenciaProdutoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(Url.Content("~/AssistenciaTecnica/BuscarProduto/"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.AssistenciaTecnica.GridAssistenciaTecnicaModel.BEAssistenciaTecnicaDetalheColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(true, deleteUrl: Url.Content("~/AssistenciaTecnica/DeletarProdutoAssistencia"))
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+         ))
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}

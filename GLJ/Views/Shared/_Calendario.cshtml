@@ -1,0 +1,256 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Agenda.PDAgenda
+<link href="@Url.Content("~/Content/fullcalendar/fullcalendar.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Content/fullcalendar/fullcalendar.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.livequery.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/i18n/datepickerPt-BR.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/datetimepicker.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/datetime.js")" type="text/javascript"></script>
+<style>
+    .customStyleDay
+    {
+        background-color: White;
+    }
+</style>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#popupAddEvent").dialog({ autoOpen: false, tilte: 'Dados para Agendamento', modal: true, resizable: false, height: 600, width: 850 });
+
+        //Traduzindo DatePicker
+        $.datepicker.setDefaults($.datepicker.regional['pt-BR']);
+
+        //Configurando Data Inicio 
+        $("#txtDataEntrega").datetimepicker({
+            dateFormat: 'dd/mm/yy'
+        });
+
+        $('.fc-view fc-view-month fc-grid').attr('style', '-moz-user-select: none;display: block;');
+
+        //Inicializar Calendario
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'today',
+                center: 'title'
+            },
+            aspectRatio: 3, //Tamanho da coluna em relação a tela
+            weekends: true,
+            editable: true, //se pode ser modificado ou não
+            eventSources: [{//busca os eventos na base de dados
+                url: '@Url.Action("BuscarAgenda", "Agenda")',
+                type: 'POST',
+                error: function () {
+                    alert('Aconteceu um erro enquanto consultava a agenda!');
+                },
+                color: 'brown',   // a non-ajax option
+                textColor: 'black' // a non-ajax option
+            }],
+            eventRender: function (event, element, view) {//Criar os eventos customizados
+                var imageTitle = '<img src="@Url.Content("~/Content/img/")' + event.nameImageTitle + '" />';
+                var html = imageTitle + '<b>' + event.title + '</b>';
+                $(element).html(html);
+            },
+            dayClick: function (date, allDay, jsEvent, view) {
+                ShowEventModal();
+            },
+            eventClick: function (calEvent, jsEvent, view) {
+                $.post('@Url.Action("BuscaEvento", "Agenda")', { codigoAgenda: calEvent.id, codigoPedido: calEvent.Pedido.Codigo, codigoCliente: calEvent.Pedido.Cliente.Codigo }, function (result) {
+                    if (result.Success) {
+                        $('#txtCodigoPedido').val(calEvent.Pedido.Codigo);
+                        $('#txtCliente').val(calEvent.Pedido.Cliente.Nome);
+                        $('#drpStatus').val(calEvent.StatusAgenda);
+                        $('#txtDataEntrega').datepicker('setDate', calEvent.start);
+                        $('#txtCodigo').val(calEvent.id);
+                        $('#txtEndereco').val(result.Data.Endereco);
+                        $('#txtBairro').val(result.Data.Bairro);
+                        $('#txtCEP').val(result.Data.CEP);
+                        $('#txtReferencia').val(result.Data.Referencia);
+                        $('#txtInformacaoAdicional').val(calEvent.Pedido.InformacaoAdicional);
+                        $('#txtPlacaVeiculo').val(calEvent.placa);
+                        $('#txtMotorista').val(calEvent.motorista);
+
+                        $("#ProdutoGrid").jqGrid().trigger("reloadGrid");
+                        $("#gridPedidoObservacao").jqGrid().trigger("reloadGrid");
+                    }
+                    else {
+
+                        $('.error').html(data.Mensage);
+                        $('.error').show();
+                    }
+                });
+
+
+                ShowEventModal();
+            },
+            eventDrop: function (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {//trocar o evento para outro dia
+                //Salvar Evento trocado de dia
+                $.ajax({
+                    url: url + '@Url.Content("~/Agenda/SalvarEvento/?codigoAgenda=")' + event.id + '&codigoPedido=' + event.Pedido.Codigo + '&data=' + $.fullCalendar.formatDate(event.start, "dd/MM/yyyy hh:mm:ss"),
+                    type: 'GET',
+                    success: function (data) {
+                        if (data.Success) {
+                            $('.success').html(data.Mensage);
+                            $('.success').show();
+                            $('#calendar').fullCalendar('refetchEvents');
+                        }
+                        else {
+                            $('.error').html(data.Mensage);
+                            $('.error').show();
+                            $('#calendar').fullCalendar('refetchEvents');
+                        }
+                    }
+                });
+            }
+        });
+
+    });
+
+    function ShowEventModal() {
+        if ($('#txtDescricao').val() != '') {
+            $("#popupAddEvent").dialog('open');
+        }
+    }
+
+    function Salvar() {
+        $.post('@Url.Action("SalvarAlteracao", "Agenda")', { CodAgenda: $('#txtCodigo').val(), StatusAgenda: $('#drpStatus').val(), CodigoPedido: $('#txtCodigoPedido').val(), PlacaVeiculo: $("#txtPlacaVeiculo").val(), Motorista: $("#txtMotorista").val() }, function (result) {
+            if (result.Success) {
+
+                $("#popupAddEvent").dialog('close');
+                $('#calendar').fullCalendar('refetchEvents');
+            }
+            else {
+
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+
+    }
+</script>
+<div id="fullCalender">
+    <div id='calendar' style='margin: 3em 0; font-size: 13px; width: 90%; margin: 0px auto;'>
+    </div>
+    <br />
+    <div style="background-color: #021af1; margin-left: 5%; width: 16%; color: #000000">
+        Entregue</div>
+    <div style="background-color: #f1eb46; margin-left: 5%; width: 16%; color: #000000">
+        Observação</div>
+    <div style="background-color: #f1a6c9; margin-left: 5%; width: 16%; color: #000000">
+        Aprovado</div>
+    <div style="background-color: #f1a40a; margin-left: 5%; width: 16%; color: #000000">
+        Entrega Pendente</div>
+    <div style="background-color: #f10505; margin-left: 5%; width: 16%; color: #000000">
+        Assitencia Técnica</div>
+    <div style="background-color: #05f105; margin-left: 5%; width: 16%; color: #000000">
+        Confirmado com o Cliente</div>
+</div>
+<div id="popupAddEvent" title="Detalhes do Agendamento">
+    <div class="divTituloPagina">
+        <h3>
+            Detalhes do Agendamento</h3>
+    </div>
+    <fieldset>
+        @Html.HiddenFor(p => p.Pedido.Codigo, new { id = "txtCodigoPedido" })
+        @Html.HiddenFor(a => a.AgendaEntrega.Codigo, new { id = "txtCodigo" })
+        <div class="popupForm">
+            @Html.LabelFor(p => p.Pedido.Cliente.Nome)
+            @Html.TextBoxFor(p => p.Pedido.Cliente.Nome, new { @class = "textInput", style = "width: 50%", id = "txtCliente", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(p => p.Pedido.Cliente.Nome)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(p => p.Pedido.Cliente.DadosCliente.Endereco)
+            @Html.TextBoxFor(p => p.Pedido.Cliente.DadosCliente.Endereco, new { @class = "textInput", style = "width: 50%", id = "txtEndereco", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(p => p.Pedido.Cliente.DadosCliente.Endereco)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(p => p.Pedido.Cliente.DadosCliente.Bairro)
+            @Html.TextBoxFor(p => p.Pedido.Cliente.DadosCliente.Bairro, new { @class = "textInput", style = "width: 25%", id = "txtBairro", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(p => p.Pedido.Cliente.DadosCliente.Bairro)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(p => p.Pedido.Cliente.DadosCliente.CEP)
+            @Html.TextBoxFor(p => p.Pedido.Cliente.DadosCliente.CEP, new { @class = "textInput", style = "width: 25%", id = "txtCEP", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(p => p.Pedido.Cliente.DadosCliente.CEP)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(p => p.Pedido.Cliente.DadosCliente.Referencia)
+            @Html.TextBoxFor(p => p.Pedido.Cliente.DadosCliente.Referencia, new { @class = "textInput", style = "width: 50%", id = "txtReferencia", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(p => p.Pedido.Cliente.DadosCliente.Referencia)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(a => a.AgendaEntrega.DataInicio)
+            @Html.TextBoxFor(a => a.AgendaEntrega.DataInicio, new { @class = "textInput", style = "width: 50%", id = "txtDataEntrega", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(a => a.AgendaEntrega.DataInicio)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(a => a.AgendaEntrega.StatusAgenda)
+            @Html.DropDownListFor(a => a.AgendaEntrega.StatusAgenda, TempData["Status"] as IEnumerable<SelectListItem>, "Selecione um status de Entrega", new { @class = "textInput", id = "drpStatus", style = "width: 45% !important" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(a => a.AgendaEntrega.StatusAgenda)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(p => p.Pedido.InformacaoAdicional)
+            @Html.TextAreaFor(p => p.Pedido.InformacaoAdicional, new { @class = "textInput", id = "txtInformacaoAdicional", @readonly = "readonly" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(p => p.Pedido.InformacaoAdicional)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(a => a.AgendaEntrega.PlacaVeiculo)
+            @Html.TextBoxFor(a => a.AgendaEntrega.PlacaVeiculo, new { @class = "textInput", id = "txtPlacaVeiculo" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(a => a.AgendaEntrega.PlacaVeiculo)</p>
+        </div>
+        <div class="popupForm">
+            @Html.LabelFor(a => a.AgendaEntrega.MotoristaVeiculo)
+            @Html.TextBoxFor(a => a.AgendaEntrega.MotoristaVeiculo, new { @class = "textInput", id = "txtMotorista" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(a => a.AgendaEntrega.MotoristaVeiculo)</p>
+        </div>
+
+        <div id="grid" class="popupForm">
+            @Html.Grid(new GridControl()
+        .SetName("ProdutoGrid")
+        .SetPageSize(20)
+        .SetListUrl(string.Format(Url.Content("~/Agenda/Buscar/?idPedido={0}"), (Model != null ? Model.Pedido.Codigo : 0)))
+        .SetWidth("500")
+        .UseColumns(GLJ.Models.Agenda.GridPedidoDetalheModel.BEPedidoDetalheColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowSearch(false, false)
+                .ShowRefresh(false)
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                 ))
+        </div>
+        <div id="grid" class="popupForm">
+            @Html.Grid(new GridControl()
+        .SetName("gridPedidoObservacao")
+        .SetPageSize(20)
+        .SetListUrl(string.Format(Url.Content("~/Agenda/ObterPedidoObservacao/?idPedido={0}"), (Model != null ? Model.Pedido.Codigo : 0)))
+        .SetWidth("500")
+        .UseColumns(GLJ.Models.Pedido.GridPedidoModel.BEPedidoObservacaoColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowSearch(false, false)
+                .ShowRefresh(false)
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+        </div>
+    </fieldset>
+    <div class="buttonAction">
+        <input type='button' class="primaryAction" onclick="$('#popupAddEvent').dialog('close');"
+            value="Cancelar" />
+        <input type="button" class="primaryAction" value="Salvar" onclick="Salvar()" />
+    </div>
+</div>

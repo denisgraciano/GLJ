@@ -1,0 +1,62 @@
+﻿@{
+    ViewBag.Title = "Associar Usuario para a Filial da Loja";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Acesso.PDAcesso
+@using (Html.BeginForm("SalvarUsuarioFilial", "Acesso", FormMethod.Post, new { enctype = "multipart/form-data", id = "formUsuarioFilial", @class = "uniForm" }))
+{
+        <fieldset class="inlineLabels">
+        <h3>
+            Assistência Técnica - Cadastro de Grupo de Acesso por Tela</h3>
+        @Html.HiddenFor(m => m.UsuarioFilialLoja.Codigo)
+        @Html.HiddenFor(m => m.Usuario.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Usuario.NomeUsuario)
+            @Html.TextBoxFor(m => m.Usuario.NomeUsuario, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.UsuarioFilialLoja.FilialLoja.Nome)
+            @Html.DropDownListFor(m => m.UsuarioFilialLoja.CodigoFilialLoja, TempData["FilialLoja"] as IEnumerable<SelectListItem>, "Selecione uma Filial", new { @class = "textInput" })
+            <img src="../../Content/img/Add.png" id="imgAdicionarFilial" />
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Selecione uma Tela." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.GrupoView)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" /></div>
+    </fieldset>
+}
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("gridUsuarioFilial")
+        .SetPageSize(15)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(string.Format(Url.Content("~/Acesso/ObterUsuarioFilial/?codigoUsuario={0}"), (Model != null ? Model.Usuario.Codigo : 0)))
+        .SetHeight("'100%'")
+        .SetIsAutoSize(true)
+        .UseColumns(GLJ.Models.Acesso.GridUsuarioFilialLojaModel.BEUsuarioFilialLojaColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(true, deleteUrl: Url.Content("~/Acesso/DeletarUsuarioFilial"))
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>
+<script type='text/javascript'>
+    $(document).ready(function () {
+
+        $('#imgAdicionarFilial').click(function () {
+            $.post(url + "/Acesso/AdicionarFilial", $('#formUsuarioFilial').serialize(), function (data) {
+                if (data.Success) {
+                    $('#gridUsuarioFilial').jqGrid().trigger("reloadGrid");
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>

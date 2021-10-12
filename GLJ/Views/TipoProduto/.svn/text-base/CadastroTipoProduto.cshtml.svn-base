@@ -1,0 +1,33 @@
+﻿@model GLJ.Models.TipoProduto.PDTipoProduto
+@{
+    ViewBag.Title = "Cadastro do Tipo de Produto";
+}
+@using (Ajax.BeginForm("Salvar", "TipoProduto", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        <h3>
+            Gestão de Loja - Cadastro do Tipo de Produto</h3>
+        
+        @Html.HiddenFor(m => m.TipoProduto.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.TipoProduto.Descricao)
+            @Html.TextBoxFor(m => m.TipoProduto.Descricao, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Descrição do Tipo Produto." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.TipoProduto.Descricao)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}
+<div>
+    <p>@Html.ActionLink("Finaliza Cadastro", "ConsultarTipoProduto")
+    </p>
+</div>

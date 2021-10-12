@@ -1,0 +1,24 @@
+﻿<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#txtProduto').autocomplete({
+            source: '@Url.Action("AutoCompleteProduto", "Produto")',
+            minLength: 3,
+            select: function (e, data) {
+                $.post('@Url.Action("AdicionarProduto", "Pedido")', { Codigo: data.item.Codigo }, function (result) {
+                    if (result.Success) {
+                        AtualizarPedido();
+                    }
+                    else {
+                        alert(result.Mensage);
+                    }
+                });
+            }
+        });
+    });
+</script>
+<div class="ctrlHolder">
+    @Html.Label("Produto")
+    @Html.TextBox("ProdutoComplete", null, new { @class = "textInput", id = "txtProduto", style = "width: 50%", })
+    <img id="imgPesquisarProduto" src='@Url.Content("~/Content/img/finder_24.png")' alt="Pesquisar Produto" style="cursor:pointer" title="Pesquisar Avançada de Produto" />
+    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Digite o nome do produto para buscar ou clique em pesquisar." alt=""  />
+</div>

@@ -1,0 +1,124 @@
+﻿@model GLJ.Models.Pedido.PDPedido
+@using MVC.Controls
+@using MVC.Controls.Grid
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //Salvar dados
+        $("#formPedido").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    //Abilitar ABA pagamento
+                    $('#tabs').tabs('enable', 1);
+                    $('#tabs').tabs('select', 1);
+
+                    //Preencher os valores para pagamento
+                    PreencherDadosPagamento(data.Data);
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+
+
+    function AfterSaveCell(rowid, cellname, value, iRow, iCol) {
+        AtualizarPedido();
+    }
+
+    function AtualizarPedido() {
+        $.post('@Url.Action("ObterValores", "Pedido")', { desconto: $('#desconto').val() }, function (result) {
+            if (result.Success) {
+                $('#subTotal').val(result.Data.SubTotal);
+                $('#totalPedido').val(result.Data.TotalPedido);
+            }
+            else {
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+
+        $('#PedidoProdutoGrid').jqGrid().trigger("reloadGrid");
+    }
+
+    function AtualizarDesconto() {
+    }
+</script>
+<div class="divTituloPagina">
+    <h3>
+        Dados do Cliente e Produtos</h3>
+</div>
+@using (Ajax.BeginForm("SalvarRascunhoPedido", "Pedido", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { @class = "uniForm", id = "formPedido" }
+        ))
+{
+    <div class="ctrlHolder">
+        @Html.LabelFor(m => m.Pedido.NumeroPedido)
+        @Html.TextBoxFor(m => m.Pedido.NumeroPedido, new { @class = "textInput", style = "width: 50%", id = "txtNumeroPedido", placeholder = Html.PlaceHolder(m => m.Pedido.NumeroPedido), disabled = "disabeld" })
+        <p class="formHint">
+            @Html.ValidationMessageFor(m => m.Pedido.NumeroPedido)</p>
+        <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.Pedido.NumeroPedido)" alt=""  />
+    </div>
+    
+    @Html.Partial("_Cliente")
+    @Html.Partial("_Produto")
+
+
+    <div id="grid">
+        @Html.Grid(new GridControl()
+        .SetName("PedidoProdutoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Pedido/BuscarProduto/"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Pedido.GridPedidoModel.BEPedidoDetalheColumns)
+                .SetAdditionalAttributes(",cellsubmit: 'remote', cellEdit: true,cellurl: '" + Url.Content("~/Pedido/EditarQuantidade") + "',afterSaveCell : AfterSaveCell")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+    </div>
+   
+    
+    <div id="divTotalPedido">
+     <div class="divTituloPagina">
+                <h3>
+                    Total Pedido</h3>
+            </div>
+        <fieldset class="inlineLabels">           
+            <div class="ctrlHolder">
+                @Html.Label("Sub Total :") @Html.TextBox("subTotal", null, new { id = "subTotal", @class = "textInput", disabled = "disabled", style = "width: 10%" })
+            </div>
+            <div class="ctrlHolder">
+                @Html.Label("Desconto :") @Html.TextBox("desconto", null, new { id = "desconto", @class = "textInput", style = "width: 10%" })
+            </div>
+            <div class="ctrlHolder">
+                @Html.Label("Total Pedido :") @Html.TextBox("totalPedido", null, new { id = "totalPedido", @class = "textInput", disabled = "disabled", style = "width: 10%" })
+            </div>
+        </fieldset>
+    </div>
+    <div class="line">
+    </div>
+    
+    @Html.HiddenFor(m => m.Pedido.Codigo)
+    <div class="buttonHolder">
+        <input type="submit" class="primaryAction" value="Continuar" />
+        <div class="secondaryAction">
+            @Html.ActionLink("Cancelar", "CancelarPedido", "Pedido")
+        </div>
+    </div>
+}

@@ -1,0 +1,18 @@
+﻿<div id="divResumo">
+ <div class="divTituloPagina">
+        <h3>
+            Resumo do Pedido</h3>
+    </div>
+</div>
+<div class="line">
+</div>
+<div class="uniForm">
+    <fieldset class="inlineLabels">
+        <div class="buttonHolder">
+            <input type="button" class="primaryAction" value="Continuar" onclick="Finalizar();" />
+            <div class="secondaryAction">
+                @Html.ActionLink("Cancelar", "CancelarPedido", "Pedido")
+            </div>
+        </div>
+    </fieldset>
+</div>

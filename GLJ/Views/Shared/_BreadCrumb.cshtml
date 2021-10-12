@@ -1,0 +1,34 @@
+﻿@using GLJ.Acesso.Business.Entity;
+@{
+    String[] paths = Request.Url.Segments;
+    String[] pathsNew = paths.Where(p => p.ToLowerInvariant() != (GLJ.Models.Utils.AplicationPathName.ToLowerInvariant() + "/")).ToArray<String>();
+
+    Int32 _out;
+}
+@if (Session != null && Session["UsuarioLogin"] != null)
+{
+    <ul id="crumbs">
+        <li>@Html.ActionLink("Home", "Index", "Home")</li>
+        @for (int i = 1; i < pathsNew.Length; i++)
+        {
+            string pathBusca = pathsNew[i].Replace("/", "");
+            var item = ((BEUsuario)Session["UsuarioLogin"]).ViewsController.FirstOrDefault(v => v.Controle.Equals(pathBusca, StringComparison.InvariantCultureIgnoreCase) || v.View.Equals(pathBusca, StringComparison.InvariantCultureIgnoreCase));
+
+            if (i != pathsNew.Length - 1 && !Int32.TryParse(pathsNew[i], out _out))
+            {
+                if (item != null)
+                {
+                    <li>@Html.ActionLink(item.Descricao, item.View, item.Controle)</li>                                     
+                }
+            }
+            else if (!Int32.TryParse(@pathsNew[i], out _out))
+            {
+                if (item != null)
+                {
+                    <li>@item.Descricao</li>
+                }
+
+            }
+        }
+    </ul>
+}

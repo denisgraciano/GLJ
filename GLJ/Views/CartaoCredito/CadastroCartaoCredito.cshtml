@@ -1,0 +1,40 @@
+﻿@model GLJ.Models.CartaoCredito.PDCartaoCredito
+@{
+    ViewBag.Title = "Cadastro de Cartões de Credito";
+}
+<div class="divTituloPagina">
+    <h3>@ViewBag.Title</h3>
+</div>
+@using (Ajax.BeginForm("Salvar", "CartaoCredito", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.CartaoCredito.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.CartaoCredito.Nome)
+            @Html.TextBoxFor(m => m.CartaoCredito.Nome, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Bandeira do Cartão de Crédito." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.CartaoCredito.Nome)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.CartaoCredito.Ativo)
+            @Html.CheckBoxFor(m => m.CartaoCredito.Ativo, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe Ativo/Inativo do Cartão de Crédito." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.CartaoCredito.Ativo)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}
+<div>
+    <p>@Html.ActionLink("Finaliza Cadastro", "ConsultarCartaoCredito")
+    </p>
+</div>

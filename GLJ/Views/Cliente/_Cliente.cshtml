@@ -1,0 +1,140 @@
+﻿@model GLJ.Models.Cliente.PDCliente
+@{
+    ViewBag.Title = "Aba Cadastro de cliente";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#cpf').setMask();
+        $('#cnpj').setMask();
+        $('#dataNascimento').setMask();
+        $("#dataMaternidade").datepicker({ dateFormat: 'dd/mm/yy' });
+
+
+        $('#cmbtipoPessoa').change(function () {
+            if (this.value == 2) {
+                $('#CNPJ').show();
+                $('#CPF').hide();
+                $('#cpf').val('');
+                $('#cnpj').val('');
+            }
+            else {
+                $('#CNPJ').hide();
+                $('#CPF').show();
+                $('#cnpj').val('');
+                $('#cpf').val('');
+            }
+
+        });
+
+        //Salvar dados
+
+        $("#formCli").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+                    //HAbilitar a aba endereço
+                    $('#tabs').tabs('enable', 1);
+                    $('#tabs').tabs('select', 1);
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+
+        $('#cpf').blur(function () {
+            $.post('@Url.Action("VerificaCliente", "Cliente")', { CPF: $('#cpf').val() }, function (data) {
+
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+
+    });
+
+</script>
+<div class="divTituloPagina">
+    <h3>
+        Cadastro Principal do Cliente</h3>
+</div>
+@using (Ajax.BeginForm("Salvar", "Cliente", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm", id = "formCli" }
+        ))
+{
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.Cliente.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Cliente.TipoCliente)
+            @Html.DropDownListFor(m => m.Cliente.TipoCliente, TempData["TipoPessoa"] as IEnumerable<SelectListItem>, new { @class = "textInput", id = "cmbtipoPessoa", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o nome Do Cliente" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.Nome)</p>
+        </div>
+        <div class="ctrlHolder", id="CPF">
+            @Html.LabelFor(m => m.Cliente.CPF)
+            @Html.TextBoxFor(m => m.Cliente.CPF, new { @class = "textInput", id = "cpf", alt = "cpf", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CPF do Cliente." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.CPF)</p>
+        </div>
+        <div class="ctrlHolder", hidden=true, id="CNPJ">
+            @Html.LabelFor(m => m.Cliente.CNPJ)
+            @Html.TextBoxFor(m => m.Cliente.CNPJ, new { @class = "textInput", id = "cnpj", alt = "cnpj", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ do Cliente." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.CPF)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Cliente.Nome)
+            @Html.TextBoxFor(m => m.Cliente.Nome, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o nome Do Cliente" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.Nome)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Cliente.RG)
+            @Html.TextBoxFor(m => m.Cliente.RG, new { @class = "textInput", style = "width: 15% !important", })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o RG do Cliente." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.RG)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Cliente.Email)
+            @Html.TextBoxFor(m => m.Cliente.Email, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o E-Mail do Cliente." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.Email)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Cliente.DataNascimento)
+            @Html.TextBoxFor(m => m.Cliente.DataNascimento, new { id = "dataNascimento", alt = "date", @class = "textInput", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Data de Nascimento." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.DataNascimento)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Cliente.DataMaternidade)
+            @Html.TextBoxFor(m => m.Cliente.DataMaternidade, new { id = "dataMaternidade" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Data aproximada do nascimento do Bebê." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Cliente.DataMaternidade)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar Cadastro Principal" />
+        </div>
+    </fieldset>
+}

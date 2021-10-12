@@ -1,0 +1,44 @@
+﻿@using GLJ.Acesso.Business.Entity;
+@model GLJ.Models.ProcessData
+@{
+    if (Session != null && Session["UsuarioLogin"] != null)
+    {
+        BEUsuario beUsuario = Session["UsuarioLogin"] as BEUsuario;    
+      <p>
+      <a href="#" id="btnInfo">@beUsuario.Login</a>       
+      @*<div id="imgUserInfo" class="imgUserInfo">
+        </div>*@
+    </p>
+    <div class="divInfoLogin" style="display: none">
+        <div class="editor-label">@Html.LabelFor(m => m.UsuarioLogin.Login)</div>
+        <div class="editor-field">@beUsuario.Login</div> 
+        <div id="line"></div>    
+        <div class="editor-label">@Html.LabelFor(m => m.UsuarioLogin.Loja)</div>
+        <div class="editor-field">
+            @if (beUsuario.Loja != null)
+            {
+                @beUsuario.Loja.Nome
+            }
+        </div>
+      <div id="line"></div>        
+            @Html.ActionLink("Sair", "LogOff", "Login")        
+    </div>
+    
+    }
+}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#btnInfo').click(function () {
+            $('.divInfoLogin').toggle('fast', function () {
+                if ($('#imgUserInfo').attr('class') === "imgUserInfo") {
+                    $('#imgUserInfo').removeClass('imgUserInfo').addClass('imgUserInfoClick');
+                }
+                else {
+                    $('#imgUserInfo').removeClass('imgUserInfoClick').addClass('imgUserInfo');
+
+                }
+            });
+        });
+    });
+</script>
+

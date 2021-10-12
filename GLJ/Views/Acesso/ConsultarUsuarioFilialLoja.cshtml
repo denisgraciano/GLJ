@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "Associar Usuário na Filial";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Acesso.PDAcesso
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarUsuario", "Acesso", FormMethod.Post, new { id = "formBuscarUsuario", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.feUsuario.Login)
+                    @Html.TextBoxFor(m => m.feUsuario.Login, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Login do Usuário." alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.feUsuario.Ativo)
+                    @Html.CheckBoxFor(m => m.feUsuario.Ativo, new { @class = "textInput" })
+                </div>
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("UsuarioFilialGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Acesso/BuscarUsuarioGrid"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Acesso.GridUsuarioModel.BEUsuarioColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .CreateSubGrid(new GridControl()
+            .SetName("subGridUsuarioFilial")
+            .SetPageSize(10)
+            .SetIsAutoSize(true)
+            .UseColumns(GLJ.Models.Acesso.GridUsuarioFilialLojaModel.BEUsuarioFilialLojaColumns)
+            .SetListUrl(Url.Content("~/Acesso/BuscarUsuarioGrid?CodigoId="))
+        )        
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarUsuarioFilial").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#UsuarioFilialGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        var idAssistencia = $("#UsuarioFilialGrid").getRowData(rowid).Codigo;
+        window.open(url + '@Url.Content("~/Acesso/AssociaUsuarioFilialLoja/")' + $("#UsuarioFilialGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

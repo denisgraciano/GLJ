@@ -1,0 +1,140 @@
+﻿@model GLJ.Models.Loja.PDCadastroLoja
+@{
+    ViewBag.Title = "Cadastro de Lojista";
+}
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.meio.mask.js")" type="text/javascript"></script>
+    
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Setar o nome do controle de Cidade
+        $('#cmbEstado').attr('name', 'Loja.UF');
+        $('#cmbCidade').attr('name', 'Loja.CodigoCidade');
+        $('#telefone').setMask();
+        $('#cnpj').setMask();
+    });
+</script>
+<div>
+    @using (Ajax.BeginForm("Salvar", "Loja", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm" }
+    ))
+    {
+        @Html.ValidationSummary(true)
+        <fieldset class="inlineLabels">
+            <h3>
+                Gestão Loja - Cadastro de Lojistas</h3>
+            @Html.HiddenFor(m => m.Loja.Codigo)
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Nome)
+                @Html.HiddenFor(m => m.Loja.Codigo)
+                @Html.TextBoxFor(m => m.Loja.Nome, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome Fantasia da Loja" alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Nome)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.RazaoSocial)
+                @Html.TextBoxFor(m => m.Loja.RazaoSocial, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Razão Social." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.RazaoSocial)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.CNPJ)
+                @Html.TextBoxFor(m => m.Loja.CNPJ, new { @class = "textInput", style = "width: 15% !important", id="cnpj", alt="cnpj" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.CNPJ)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.InsEst)
+                @Html.TextBoxFor(m => m.Loja.InsEst, new { @class = "textInput", style = "width: 15% !important" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Inscrição Estadual." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.InsEst)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.CEP)
+                @Html.TextBoxFor(m => m.Loja.CEP, new { @class = "textInput", style = "width: 15% !important" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CEP." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.CEP)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Endereco)
+                @Html.TextBoxFor(m => m.Loja.Endereco, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Endereço." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Endereco)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.NumeroEndereco)
+                @Html.TextBoxFor(m => m.Loja.NumeroEndereco, new { @class = "textInput", style = "width: 15% !important" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Número do Endereço." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.NumeroEndereco)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Complemento)
+                @Html.TextBoxFor(m => m.Loja.Complemento, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Complemento." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Complemento)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Bairro)
+                @Html.TextBoxFor(m => m.Loja.Bairro, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Bairro." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Bairro)</p>
+            </div>
+            @Html.Partial("_EstadoCidade")
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Fone)
+                @Html.TextBoxFor(m => m.Loja.Fone, new { @class = "textInput", id="telefone", alt="phone" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Telefone." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Fone)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Email)
+                @Html.TextBoxFor(m => m.Loja.Email, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Email." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Email)</p>
+            </div>
+           <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.SiglaPedido)
+                @Html.TextBoxFor(m => m.Loja.SiglaPedido, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Sigla do Pedido." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.SiglaPedido)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Loja.Ativo)
+                @Html.CheckBoxFor(m => m.Loja.Ativo, new { @class = "textInput" })
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Loja.Ativo)</p>
+            </div>
+            <div class="buttonHolder">
+                <input type="submit" class="primaryAction" value="Salvar" />
+                @if (Model.Loja.Codigo > 0)
+                {
+                    <div class="secondaryAction">
+                        @Html.ActionLink("Inserir Contatos", "CadastroContatos", new { codigoLoja = Model.Loja.Codigo })
+                        <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe os dados de contatos da Loja." alt="" />
+                    </div>
+                    <script>
+                        $('#cmbCidade').removeAttr("disabled");
+                    </script>
+                }
+            </div>
+        </fieldset>
+    }
+</div>

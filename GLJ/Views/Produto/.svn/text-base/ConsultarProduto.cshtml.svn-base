@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Consulta de Produto";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Produto.PDProduto
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div style="height: 308px !important">
+        @using (Html.BeginForm("BuscarProduto", "Produto", FormMethod.Post, new { id = "formBuscarProduto", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEProduto.CodigoFornecedor)
+                    @Html.DropDownListFor(m => m.FEProduto.CodigoFornecedor, TempData["Fornecedor"] as IEnumerable<SelectListItem>, "Selecione um Fornecedor", new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Fornecedor." alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEProduto.CodigoTipoProduto)
+                    @Html.DropDownListFor(m => m.FEProduto.CodigoTipoProduto, TempData["TipoProduto"] as IEnumerable<SelectListItem>, "Selecione o Tipo de Produto", new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Fornecedor." alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEProduto.Descricao)
+                    @Html.TextBoxFor(m => m.FEProduto.Descricao, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Descrição do Produto" alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEProduto.CodigoFornecedorProduto)
+                    @Html.TextBoxFor(m => m.FEProduto.CodigoFornecedorProduto, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Código gerado pelo Fornecedro do Produto" alt="" />
+                </div>
+                @*//TODO:Acertar o Ativo*@ @*                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEFornecedor.Ativo)
+                    @Html.CheckBoxFor(m => m.FEFornecedor.Ativo, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ." alt="" />
+                </div>*@
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("ProdutoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Produto/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Produto.GridProdutoModel.BEProdutoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+</div>
+<div class="buttonAction">
+    @Html.ActionLink("Cadastrar Novo Produto", "CadastroProduto", null, new { @class = "primaryAction" })
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarProduto").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#ProdutoGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + "/Produto/CadastroProduto/" + $("#ProdutoGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

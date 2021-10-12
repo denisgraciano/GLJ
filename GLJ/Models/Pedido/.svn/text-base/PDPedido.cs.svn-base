@@ -1,0 +1,134 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using GLJ.Business.Entity;
+using System.ComponentModel;
+using GLJ.Filter.Entity;
+using GLJ.Models.Agenda;
+
+namespace GLJ.Models.Pedido
+{
+    public class PDPedido : ProcessData
+    {
+        [DisplayName("Total de Itens :")]
+        public Int32 TotalItens { get; set; }
+
+        [DisplayName("Valor Total do Pedido :")]
+        public Decimal? ValorTotal { get; set; }
+        
+        [DisplayName("Valor Restante para Pagamento :")]
+        public Decimal? ValorRestantePagamento { get; set; }
+
+        private BEPedido _Pedido;
+        public BEPedido Pedido {
+            get { return _Pedido; }
+            set { 
+                _Pedido = value;
+                Agenda.Pedido = value;
+            }
+        }
+
+        public BEPagamentoPedido PagamentoPedido { get; set; }
+        public BEPagamentoCartao PagamentoCartao { get; set; }
+        public BEPagamentoCheque PagamentoCheque { get; set; }
+        public BEPagamentoDinheiro PagamentoDinheiro { get; set; }
+        public List<BEPagamentoPedido> PagamentosPedido { get; set; }
+        public FECliente FECliente { get; set; }
+        public PDAgenda Agenda { get; set; }
+
+        public PDPedido()
+        {
+            PagamentosPedido = new List<BEPagamentoPedido>();
+            PagamentoCartao = new BEPagamentoCartao();
+            PagamentoCheque = new BEPagamentoCheque();
+            PagamentoDinheiro = new BEPagamentoDinheiro();
+            FECliente = new FECliente();
+            Agenda = new PDAgenda();
+            //Tem que ser intanciado depois de agenda.
+            Pedido = new BEPedido();
+
+        }
+
+        #region Métodos da Process Data
+        
+        /// <summary>
+        /// Adicionar Pagamento Cartão
+        /// </summary>
+        /// <param name="bePagamentoCartao"></param>
+        public void AdicionarPagamentoCartao(BEPagamentoCartao bePagamentoCartao)
+        {
+            //Adicionar Pagamento
+            AdicionarPagamento(TipoPagamento.CARTAOCREDITO);
+
+            //Somar Pagamento
+            this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == TipoPagamento.CARTAOCREDITO).PagamentosCartao.Add(bePagamentoCartao);
+            this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == TipoPagamento.CARTAOCREDITO).ValorTotalPagamento =
+                this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == TipoPagamento.CARTAOCREDITO).PagamentosCartao.Sum(c => c.ValorPagamento);
+
+            AtualizarValorRestantePagamento();
+        }
+
+        /// <summary>
+        /// Adicionar Pagamento Cheque
+        /// </summary>
+        /// <param name="bePagamentoCheque"></param>
+        public void AdicionarPagamentoCheque(BEPagamentoCheque bePagamentoCheque)
+        {
+            TipoPagamento tipo = TipoPagamento.CHEQUE;
+            //Adicionar Pagamento
+            AdicionarPagamento(tipo);
+
+            //Somar Pagamento
+            this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == tipo).PagamentosCheque.Add(bePagamentoCheque);
+            this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == tipo).ValorTotalPagamento =
+                this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == tipo).PagamentosCheque.Sum(c => c.ValorPagamento);
+
+            AtualizarValorRestantePagamento();
+        }
+
+        /// <summary>
+        /// Adicionar Pagamento Dinheiro
+        /// </summary>
+        /// <param name="bePagamentoDinhero"></param>
+        public void AdicionarPagamentoDinheiro(BEPagamentoDinheiro bePagamentoDinheiro)
+        {
+            TipoPagamento tipo = TipoPagamento.DINHEIRO;
+            //Adicionar Pagamento
+            AdicionarPagamento(tipo);
+
+            //Somar Pagamento
+            this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == tipo).PagamentosDinheiro.Add(bePagamentoDinheiro);
+            this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == tipo).ValorTotalPagamento =
+                this.PagamentosPedido.SingleOrDefault(p => p.TipoPagamento == tipo).PagamentosDinheiro.Sum(c => c.ValorPagamento);
+
+            AtualizarValorRestantePagamento();
+        }
+
+
+        /// <summary>
+        /// Adiconar Pagamento
+        /// </summary>
+        /// <param name="tipoPagamento"></param>
+        private void AdicionarPagamento(TipoPagamento tipoPagamento)
+        {
+            if (this.PagamentosPedido.FirstOrDefault(p=>p.TipoPagamento == tipoPagamento) == null)
+            {
+                this.PagamentosPedido.Add(new BEPagamentoPedido
+                {
+                    CodigoPedido = this.Pedido.Codigo,
+                    DataPagamento = DateTime.Now,
+                    TipoPagamento = tipoPagamento,
+                });
+            }
+        }
+
+        private void AtualizarValorRestantePagamento()
+        {
+            decimal? valorPago = this.PagamentosPedido.Sum(v => v.ValorTotalPagamento);
+            this.ValorRestantePagamento = this.ValorTotal - valorPago;
+        }
+
+        #endregion
+    }
+}

@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "Consultar Configuracao Loja";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Configuracao.PDConfiguracao
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("ConfiguracaoGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Configuracao/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Configuracao.GridConfiguracaoModel.BEConfiguracaoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+</div>
+<script type="text/javascript">
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + "/Configuracao/CadastroConfiguracao/" + $("#ConfiguracaoGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

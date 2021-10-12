@@ -1,0 +1,143 @@
+﻿@model GLJ.Models.Pedido.PDPedido
+@using MVC.Controls
+@using MVC.Controls.Grid
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.meio.mask.js")" type="text/javascript"></script>
+}
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $('#txtCpf').setMask();
+
+        carregaCliente($("#txtCodigoCliente").val());
+
+        $('#txtCliente').autocomplete({
+            source: '@Url.Action("AutoCompleteCliente", "Cliente")',
+            delay: 100,
+            minLength: 3,
+            select: function (e, data) {
+                $('#txtCodigoCliente').val(data.item.Codigo);
+                var html = "<div class='ctrlHolder'><label><b>Nome</b></label><div class='textInput'>" + data.item.value + "</div></div>";
+                var html = html + "<div class='ctrlHolder'><label><b>CPF</b></label><div class='textInput'>" + data.item.CPF + "</div></div>";
+
+                $.ajax({
+                    type: 'GET',
+                    url: url + '@Url.Content("~/Cliente/ObterDetalheCliente/?codigoCliente=")' + data.item.Codigo,
+                    success: function (data) {
+                        html = html + "<div class='ctrlHolder'><label><b>Endereço</b></label><div class='textInput'>" + data[0].endereco + "</div></div>";
+                    }
+                });
+                
+                $('#detalhesCliente_info').html(html);
+                $('#detalhesCliente').show();
+            }
+        });
+
+        $("#popupBuscaCliente").dialog({ autoOpen: false, title: 'Busca de Cliente', modal: true, resizable: false, height: 600, width: 800,
+            beforeClose: function (event, ui) {
+                if (!$("#Cliente").val()) {
+                    $("#ClienteGrid").jqGrid().trigger("reloadGrid");
+                }
+            }
+        });
+
+        $('#imgBuscarClientes').click(function () {
+            $("#popupBuscaCliente").dialog('open');
+        });
+
+        $("#btnBuscarCliente").click(function () {
+            $.post('@Url.Action("BuscarClientePopUp","Cliente")', { Nome: $('#txtNome').val(), Cpf: $('#txtCpf').val(), RG: $('#txtRG').val() }, function (retorno) {
+                $("#ClienteGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+
+    function doubleClick(rowid, iRow, iCol, e) {
+        $('#txtCodigoCliente').val($("#ClienteGrid").getRowData(rowid).Codigo);
+
+        carregaCliente($("#ClienteGrid").getRowData(rowid).Codigo);
+
+        
+        $("#popupBuscaCliente").dialog('close');
+   }
+
+   function carregaCliente(idCliente) {
+       var html;
+       $.ajax({
+           type: 'GET',
+           url: url + '@Url.Content("~/Cliente/ObterDetalheCliente/?codigoCliente=")' + idCliente,
+           success: function (result) {
+               if (result.Success) {
+                   html = "<div class='ctrlHolder'><label><b>Nome</b></label><div class='textInput'>" + result.Data.Nome + "</div></div>";
+                   html = html + "<div class='ctrlHolder'><label><b>CPF</b></label><div class='textInput'>" + result.Data.CPF + "</div></div>";
+                   html = html + "<div class='ctrlHolder'><label><b>Endereço</b></label><div class='textInput'>" + result.Data.Endereco + "</div></div>";
+                   $('#detalhesCliente_info').html(html);
+               }
+               else {
+                   $('.error').html(data.Mensage);
+                   $('.error').show();
+               }
+           }
+       });
+       $('#detalhesCliente').show();
+   }
+
+</script>
+
+<div class="ctrlHolder">
+    @Html.Label("Cliente")
+    @Html.HiddenFor(m => m.Pedido.CodigoCliente, new { id = "txtCodigoCliente" })
+    @Html.TextBox("cliente", null, new { @class = "textInput", style = "width: 50%", id = "txtCliente" })
+    <img src='@Url.Content("~/Content/img/finder_24.png")' id="imgBuscarClientes"  />
+    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o nome do cliente." alt=""  />
+    <div id="cliente">
+        <a href="#" onclick="javascript:$('#detalhesCliente').toggle()"><b>Detalhes do Cliente</b></a>
+        <div id="detalhesCliente" style="display: none">
+            <fieldset style="background-color: rgb(239,239,239)">
+                <div id="detalhesCliente_info">
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div id="popupBuscaCliente" title="Busca Cliente">
+        <fieldset>
+            <div class="popupForm">
+                @Html.LabelFor(m => m.FECliente.Nome)
+                @Html.TextBoxFor(m => m.FECliente.Nome, new { @class = "textInput",id="txtNome" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.Nome)" alt="" />
+            </div>
+            <div class="popupForm">
+                @Html.LabelFor(m => m.FECliente.Cpf)
+                @Html.TextBoxFor(m => m.FECliente.Cpf, new { @class = "textInput", id = "txtCpf", alt = "cpf",})
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.Cpf)" alt="" />
+            </div>
+            <div class="buttonAction">
+                <input type="button" class="primaryAction" value="Buscar" id="btnBuscarCliente" />
+                <input type="button" class="primaryAction" value="Limpar" id="btnLimparCliente" />
+                <input type="button" class="primaryAction" value="Adicionar" id="btnAdicionar" />
+            </div>
+        </fieldset>
+    
+    <div id="grid">
+        @Html.Grid(new GridControl()
+        .SetName("ClienteGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Cliente/Buscar"))
+        .SetHeight("'100%'")
+        .SetWidth("'80%'")
+        .UseColumns(GLJ.Models.Cliente.GridClienteModel.BEClientePopUpColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+    </div>
+</div>

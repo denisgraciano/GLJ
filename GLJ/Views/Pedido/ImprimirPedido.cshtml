@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "Consulta de Pedido";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Pedido.PDPedido
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+
+        $('#txtCliente').autocomplete({
+            source: '@Url.Action("AutoCompleteCliente", "Cliente")',
+            delay: 100,
+            minLength: 3,
+            select: function (e, data) {
+                $('#txtCodigoCliente').val(data.item.Codigo);
+                var html = "<div class='ctrlHolder'><label><b>Nome</b></label><div class='textInput'>" + data.item.value + "</div></div>";
+                var html = html + "<div class='ctrlHolder'><label><b>CPF</b></label><div class='textInput'>" + data.item.CPF + "</div></div>";
+
+                $.ajax({
+                    type: 'GET',
+                    url: url + '/Cliente/ObterDetalheCliente/?codigoCliente=' + data.item.Codigo,
+                    success: function (data) {
+                        html = html + "<div class='ctrlHolder'><label><b>Endereço</b></label><div class='textInput'>" + data[0].endereco + "</div></div>";
+                    }
+                });
+
+                $('#detalhesCliente_info').html(html);
+                $('#detalhesCliente').show();
+            }
+        });
+    });
+
+    function Limpar() {
+        $('#txtCodigoCliente').val("");
+    };
+</script>
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarPedido", "Pedido", FormMethod.Post, new { id = "formBuscarPedido", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FEPedido.NumeroPedido)
+                    @Html.TextBoxFor(m => m.FEPedido.NumeroPedido, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Numero do Pedido" alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.Label("Cliente")
+                    @Html.HiddenFor(m => m.FEPedido.CodigoCliente, new { id = "txtCodigoCliente" })
+                    @Html.TextBox("cliente", null, new { @class = "textInput", style = "width: 50%", id = "txtCliente" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome do Cliente" alt="" />
+                </div>
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" onclick="Limpar();" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("PedidoGrid")
+        .SetPageSize(10)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Pedido/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Pedido.GridPedidoModel.BEPedidoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(true, true)
+        ))
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarPedido").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#PedidoGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + '@Url.Content("~/Relatorio/index/")' + $("#PedidoGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

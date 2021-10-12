@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Consultar Grupo Permissao";
+}
+@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Acesso.PDAcesso
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div>
+        @using (Html.BeginForm("BuscarGrupoPermissao", "Acesso", FormMethod.Post, new { id = "formBuscarGrupoPermissao", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.GrupoPermissao.Descricao)
+                    @Html.TextBoxFor(m => m.feGrupoPermissao.Descricao, new { @class = "textInput" })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o nome do Grupo." alt="" />
+                </div>
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("ConsultaPermissaoGrid")
+        .SetPageSize(10)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Acesso/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Acesso.GridGrupoPermissaoModel.BEGrupoPermissaoColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(true, true)
+        ))
+</div>
+<div class="buttonAction">
+    @Html.ActionLink("Cadastrar Novo Grupo Permissao", "CadastroGrupoPermissao", null, new { @class = "primaryAction" })
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarGrupoPermissao").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#ConsultaPermissaoGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + "/Acesso/CadastroGrupoPermissao/" + $("#ConsultaPermissaoGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

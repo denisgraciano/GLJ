@@ -1,0 +1,60 @@
+﻿@model GLJ.Models.Preco.PDPreco
+@{
+    ViewBag.Title = "Cadastro de Preço";
+}
+@section JavaScript
+{
+     <script src="@Url.Content("~/Scripts/jquery.meio.mask.js")" type="text/javascript"></script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#decimal').setMask();
+        $('#decimalVenda').setMask();
+    });
+</script>
+@using (Ajax.BeginForm("Salvar", "Preco", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        <h3>
+            Gestão de Loja - Cadastro de Preço</h3>
+        
+        @Html.HiddenFor(m => m.Preco.Codigo)
+        @Html.HiddenFor(m => m.Preco.CodigoProduto)
+        <div class="ctrlHolder">
+            @Html.HiddenFor(m => m.Preco.CodigoProduto)
+            @Html.LabelFor(m => m.Preco.Produto.Descricao)
+            @Html.TextBoxFor(m => m.Preco.Produto.Descricao, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Preco.PrecoCusto)
+            @Html.TextBoxFor(m => m.Preco.PrecoCusto, new { @class = "textInput", id = "decimal", alt = "decimal", style = "width: 5% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Preço de Custo." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Preco.PrecoCusto)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Preco.PrecoVenda)
+            @Html.TextBoxFor(m => m.Preco.PrecoVenda, new { @class = "textInput", id = "decimalVenda", alt = "decimal", style = "width: 5% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Preço de Venda." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Preco.PrecoVenda)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Preco.Margem)
+            @Html.TextBoxFor(m => m.Preco.Margem, new { @class = "textInput", style = "width: 5% !important" }) 
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Margem permitida de desconto para o Produto." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Preco.Margem)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}
+

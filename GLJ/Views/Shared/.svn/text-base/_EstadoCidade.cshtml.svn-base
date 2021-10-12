@@ -1,0 +1,36 @@
+﻿          
+<script type='text/javascript'>
+    $(document).ready(function () {
+        $('#cmbEstado').change(function () {
+            $.ajax({
+                type: 'GET',
+                url: url + '/Home/ObterCidade/?codigoEstado=' + this.value,
+                beforeSend: function () {
+                    $('#cmbCidade').attr("disabled", "disabled");
+                    $('#cmbCidade').addOption("0", "Carregando...");
+                },
+                success: function (data) {
+                    $('#cmbCidade').removeOption(/./);
+
+                    $.each(data, function (index, optionData) {
+                        $('#cmbCidade').addOption(optionData.Value, optionData.Text);
+                    });
+
+                    $('#cmbCidade').removeAttr("disabled");
+                    $('#cmbCidade').selectOptions("", false);
+                }
+            });
+        });
+    });
+</script>
+
+        <div class="ctrlHolder">
+            @Html.Label("Estado")
+            @Html.DropDownList("UF", ViewData["Estados"] as IEnumerable<SelectListItem>,"Selecione um Estado", new { id = "cmbEstado", @class = "textInput" , style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Estado." alt="" />
+        </div>
+        <div class="ctrlHolder">
+            @Html.Label("Cidade")
+            @Html.DropDownList("CodigoCidade", ViewData["Cidades"] as IEnumerable<SelectListItem>, "Selecione uma Cidade", new { id = "cmbCidade", @class = "textInput", style = "width: 15% !important" })              
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Cidade." alt="" />
+        </div>

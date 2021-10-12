@@ -1,0 +1,191 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Cliente.PDCliente
+@{
+    ViewBag.Title = "Dados complementares do cliente";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#cmbEstado').attr('name', 'DadosCliente.UF');
+        $('#cmbCidade').attr('name', 'DadosCliente.CodigoCidade');
+        $('#cep').setMask();
+        $('#phone').setMask();
+        $('#cel').setMask();
+
+        $("#cep").blur(function (e) {
+            if ($.trim($("#cep").val()) != "") {
+                $.getScript("http://cep.republicavirtual.com.br/web_cep.php?formato=javascript&cep=" + $("#cep").val(), function () {
+                    if (resultadoCEP["resultado"]) {
+                        $("#Endereco").val(unescape(resultadoCEP["tipo_logradouro"]) + " " + unescape(resultadoCEP["logradouro"]));
+                        $("#Bairro").val(unescape(resultadoCEP["bairro"]));
+                    } else {
+                        alert("Não foi possivel encontrar o endereço, para o CEP Informado!");
+                    }
+                });
+            }
+        })
+
+
+        //Salvar dados
+        $("#formClienteDados").submit(function (e) {
+            $('.error').hide();
+            $('.success').hide();
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (data) {
+                if (data.Success) {
+                    $('.success').html(data.Mensage);
+                    $('.success').show();
+
+
+                    //HAbilitar a aba endereço
+                    $('#tabs').tabs('enable', 2);
+                    $('#tabs').tabs('select', 2);
+
+                }
+                else {
+                    $('.error').html(data.Mensage);
+                    $('.error').show();
+                }
+            });
+        });
+    });
+</script>
+<div class="divTituloPagina">
+    <h3>
+        Endereço(s)</h3>
+</div>
+@using (Ajax.BeginForm("SalvarDados", "Cliente", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm", id = "formClienteDados" }
+        ))
+{
+    <fieldset class="inlineLabels">
+        @Html.HiddenFor(m => m.DadosCliente.CodigoCliente, new { @class = "textInput", id = "dadoCodigoCliente" })
+        @Html.HiddenFor(m => m.DadosCliente.Codigo, new { @class = "textInput", id = "codigo" })
+@*        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.CodigoTipoDadoCliente)
+            @Html.DropDownListFor(m => m.DadosCliente.CodigoTipoDadoCliente, TempData["Tipos"] as IEnumerable<SelectListItem>, "Selecione um Tipo de Endereço", new { @class = "textInput", id = "cmbtipoEnd", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Selecione um Tipo de Endereço." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.CodigoTipoDadoCliente)</p>
+        </div>*@
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.CEP)
+            @Html.TextBoxFor(m => m.DadosCliente.CEP, new { @class = "textInput", id = "cep", alt = "cep", style = "width: 10% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CEP." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.CEP)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.Endereco)
+            @Html.TextBoxFor(m => m.DadosCliente.Endereco, new { @class = "textInput", id = "Endereco" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Endereço." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.Endereco)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.Numero)
+            @Html.TextBoxFor(m => m.DadosCliente.Numero, new { @class = "textInput", style = "width: 5% !important", id = "Numero" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Número." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.Numero)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.Complemento)
+            @Html.TextBoxFor(m => m.DadosCliente.Complemento, new { @class = "textInput", id = "Complemento" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Complemento." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.Complemento)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.Bairro)
+            @Html.TextBoxFor(m => m.DadosCliente.Bairro, new { @class = "textInput", style = "width: 15% !important", id = "Bairro" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Bairro." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.Bairro)</p>
+        </div>
+        @Html.Partial("_EstadoCidade")
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.DadosCliente.Referencia)
+            @Html.TextBoxFor(m => m.DadosCliente.Referencia, new { @class = "textInput", id = "referencia" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe uma Referencia." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.DadosCliente.Referencia)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar Endereço" />
+        </div>
+    </fieldset>
+}
+<div id="line">
+</div>
+@*<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("DadosCliente")
+        .SetPageSize(20)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(string.Format(Url.Content("~/Cliente/ObterDadosCliente/?codigoCliente={0}"), (Model.Cliente.Codigo)))
+        .SetWidth("1000")
+        .SetAdditionalAttributes(",ondblClickRow:doubleClickEndereco")
+        .UseColumns(GLJ.Models.Cliente.GridClienteModel.BEDadosClienteColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>*@
+<script type="text/javascript">
+    function doubleClickEndereco(rowid, iRow, iCol, e) {
+        var dado = $("#DadosCliente").getRowData(rowid);
+
+
+
+
+        $('#codigo').val(dado.Codigo);
+        $('#dadoCodigoCliente').val(dado.CodigoCliente);
+        $('#cmbtipoEnd').val(dado.CodigoTipoDadoCliente);
+        $('#Endereco').val(dado.Endereco);
+        $('#Numero').val(dado.Numero);
+        $('#Complemento').val(dado.Complemento);
+        $('#cep').val(dado.CEP);
+        $('#Bairro').val(dado.Bairro);
+        $('#referencia').val(dado.Referencia);
+
+        $('#cmbEstado').val(dado.UF);
+       
+        $.ajax({
+            type: 'GET',
+            url: url + '/Home/ObterCidade/?codigoEstado=' + dado.UF,
+            beforeSend: function () {
+                $('#cmbCidade').attr("disabled", "disabled");
+                $('#cmbCidade').addOption("0", "Carregando...");
+                
+            },
+            success: function (data) {
+                $('#cmbCidade').removeOption(/./);
+
+                $.each(data, function (index, optionData) {
+                    $('#cmbCidade').addOption(optionData.Value, optionData.Text);
+                });
+                $('#cmbCidade').val(dado.CodigoCidade);
+                $('#cmbCidade').removeAttr("disabled");
+            }
+        });
+
+        
+       
+        
+    }
+
+    function enumToString(cellvalue, options, rowObject) {
+        var descricao = '';
+        $.post(url + "/Cliente/CarregarTipoEndereco/", { enumValue: cellvalue }, function (ret) {
+            descricao = ret.Descricao;
+        });
+        return descricao;
+    } 
+</script>

@@ -1,0 +1,45 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Acesso.PDAcesso
+@{
+    ViewBag.Title = "Cadastro de Grupos Por Tela";
+}
+@using (Html.BeginForm("SalvarGrupoView", "Acesso", FormMethod.Post, new { enctype = "multipart/form-data", id = "formGrupoView", @class = "uniForm" }))
+{
+        <fieldset class="inlineLabels">
+        <h3>
+            Assistência Técnica - Cadastro de Grupo de Acesso por Tela</h3>
+        @Html.HiddenFor(m => m.GrupoView.GrupoPermisao.Codigo)
+        @Html.HiddenFor(m => m.GrupoView.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.GrupoView.GrupoPermisao.Descricao)
+            @Html.TextBoxFor(m => m.GrupoView.GrupoPermisao.Descricao, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.GrupoView.ViewControle.View)
+            @Html.DropDownListFor(m => m.GrupoView.CodigoViewControle, TempData["Views"] as IEnumerable<SelectListItem>, "Selecione uma Tela", new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Selecione uma Tela." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.GrupoView)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Adicionar" /></div>
+    </fieldset>
+}
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("gridGrupoView")
+        .SetPageSize(15)
+        .SetHttpVerb(HttpVerbs.Get)
+        .SetListUrl(string.Format(Url.Content("~/Acesso/ObterGrupoView/?codigoView={0}"), (Model != null ? Model.GrupoView.GrupoPermisao.Codigo : 0)))
+        .SetHeight("'100%'")
+        .SetIsAutoSize(true)
+        .UseColumns(GLJ.Models.Acesso.GridGrupoPermissaoModel.BEGrupoViewColumns)
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(true, deleteUrl: Url.Content("~/Acesso/DeletarGrupoView"))
+                .ShowEdit(false)
+                .ShowView(false)
+        ))
+</div>

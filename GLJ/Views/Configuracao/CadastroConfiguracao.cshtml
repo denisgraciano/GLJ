@@ -1,0 +1,45 @@
+﻿@model GLJ.Models.Configuracao.PDConfiguracao
+@{
+    ViewBag.Title = "Configuração de Loja";
+}
+<div class="divTituloPagina">
+    <h3>@ViewBag.Title</h3>
+</div>
+<div>
+    @using (Ajax.BeginForm("Salvar", "Configuracao", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm" }
+    ))
+    {
+       @Html.ValidationSummary(true)
+        <fieldset class="inlineLabels">
+            @Html.HiddenFor(m => m.Configuracao.Codigo)
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Configuracao.QuantidadeDiaEntrega)
+                @Html.HiddenFor(m => m.Configuracao.QuantidadeDiaEntrega)
+                @Html.TextBoxFor(m => m.Configuracao.QuantidadeDiaEntrega, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Quantidade de dias Para Entregra." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Configuracao.QuantidadeDiaEntrega)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Configuracao.QuantidadeEntrega)
+                @Html.TextBoxFor(m => m.Configuracao.QuantidadeEntrega, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Quantidade de Entregas." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Configuracao.QuantidadeEntrega)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Configuracao.EntregaMontagem)
+                @Html.CheckBoxFor(m => m.Configuracao.EntregaMontagem, new { @class = "textInput" })
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Configuracao.EntregaMontagem)</p>
+            </div>
+            <div class="buttonHolder">
+                <input type="submit" class="primaryAction" value="Salvar" />
+           </div>
+        </fieldset>
+    }
+</div>

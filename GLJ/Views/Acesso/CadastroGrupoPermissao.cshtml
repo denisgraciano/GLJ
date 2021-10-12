@@ -1,0 +1,47 @@
+﻿@model GLJ.Models.Acesso.PDAcesso
+@{
+    ViewBag.Title = "Cadastro de Grupos de Permissao";
+}
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+}
+@using (Ajax.BeginForm("SalvarGrupoPermissao", "Acesso", new AjaxOptions()
+    {
+        HttpMethod = "Post",
+        OnSuccess = "success"
+    }, new { enctype = "multipart/form-data", @class = "uniForm" }
+    ))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        <h3>
+            Assistência Técnica - Cadastro de Grupos de Acesso</h3>
+        @Html.HiddenFor(m => m.GrupoPermissao.Codigo, new { id = "Codigo" })
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.GrupoPermissao.Descricao)
+            @Html.TextBoxFor(m => m.GrupoPermissao.Descricao, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a descrição do Grupo" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.GrupoPermissao.Descricao)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.GrupoPermissao.Ativo)
+            @Html.CheckBoxFor(m => m.GrupoPermissao.Ativo, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe Ativo/Inativo" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.GrupoPermissao.Ativo)</p>
+        </div>
+            <div class="buttonHolder">
+                <input type="submit" class="primaryAction" value="Salvar" />
+               @if (Model.GrupoPermissao.Codigo > 0)
+                {
+                    <div class="secondaryAction">
+                        @Html.ActionLink("Associar Telas ao Grupo", "CadastroGrupoView", new { idGrupoPermissao = Model.GrupoPermissao.Codigo })
+                    </div>
+                }
+            </div>
+    </fieldset>
+}

@@ -1,0 +1,10 @@
+﻿@{
+    ViewBag.Title = "Tipo Produto";
+}
+<fieldset style="padding-top=15px">
+<ul>
+    <li>@Html.ActionLink("Consultar Tipo Produto", "ConsultarTipoProduto")</li>
+    <li>@Html.ActionLink("Cadastrar Novo Tipo Produto", "CadastroTipoProduto")</li>
+</ul>
+
+</fieldset>

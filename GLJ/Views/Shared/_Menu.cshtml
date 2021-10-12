@@ -1,0 +1,9 @@
+﻿@using GLJ.Acesso.Business.Entity;
+@using GLJ.Models.Helpers;
+
+    <ul id="menu" class="artmenu">
+        @if (Session != null && Session["UsuarioLogin"] != null)
+        {
+            @Html.Menu(((BEUsuario)Session["UsuarioLogin"]).ViewsController)
+        }
+    </ul>

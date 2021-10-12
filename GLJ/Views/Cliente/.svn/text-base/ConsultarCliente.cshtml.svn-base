@@ -1,0 +1,80 @@
+﻿@using MVC.Controls
+@using MVC.Controls.Grid
+@model GLJ.Models.Cliente.PDCliente
+@{
+    ViewBag.Title = "Consultar Cliente";
+}
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+}
+<div id="buscaAvancada">
+    <h3>
+        <a href="#">Busca Avançada</a></h3>
+    <div style="height: 308px !important">
+        @using (Html.BeginForm("BuscarCliente", "Cliente", FormMethod.Post, new { id = "formBuscarCliente", @class = "uniForm" }))
+        {
+            <fieldset class="inlineLabels">
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FECliente.Nome)
+                    @Html.TextBoxFor(m => m.FECliente.Nome, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.FECliente.Nome) })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.Nome)" alt="" />
+                </div>
+                <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FECliente.Cpf)
+                    @Html.TextBoxFor(m => m.FECliente.Cpf, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.FECliente.Cpf) })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.Cpf)" alt="" />
+                </div>             
+                   <div class="ctrlHolder">
+                    @Html.LabelFor(m => m.FECliente.RG)
+                    @Html.TextBoxFor(m => m.FECliente.RG, new { @class = "textInput", placeholder = Html.PlaceHolder(m => m.FECliente.RG) })
+                    <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="@Html.Help(m => m.FECliente.RG)" alt="" />
+                </div>       
+                <div class="buttonHolder">
+                    <input type="submit" class="primaryAction" value="Buscar" />
+                    <input type="reset" value="Limpar" class="primaryAction" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+<div id="grid">
+    @Html.Grid(new GridControl()
+        .SetName("ClienteGrid")
+        .SetPageSize(20)
+        .SetIsAutoSize(true)
+        .SetListUrl(Url.Content("~/Cliente/Buscar"))
+        .SetHeight("'100%'")
+        .UseColumns(GLJ.Models.Cliente.GridClienteModel.BEClienteColumns)
+        .SetAdditionalAttributes(",ondblClickRow:doubleClick")
+        .UpdateDefaultPager(pager =>
+            pager
+                .ShowAdd(false)
+                .ShowDel(false)
+                .ShowEdit(false)
+                .ShowView(false)
+                .ShowSearch(false, false)
+        ))
+</div>
+<div class="buttonAction">
+    @Html.ActionLink("Cadastrar Novo Cliente", "CadastroCliente", null, new { @class = "primaryAction" })
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#buscaAvancada").accordion({ collapsible: true, active: -1 });
+
+        //Submit Form
+        //Salvar Informações do Formulario
+        $("#formBuscarCliente").submit(function (e) {
+            e.preventDefault();
+            $.post($(this).attr("action"), $(this).serialize(), function (retorno) {
+                $("#ClienteGrid").jqGrid().trigger("reloadGrid")
+            });
+        });
+
+    });
+    function doubleClick(rowid, iRow, iCol, e) {
+        window.open(url + "/Cliente/CadastroCliente/" + $("#ClienteGrid").getRowData(rowid).Codigo, "_self");
+    }  
+</script>

@@ -1,0 +1,45 @@
+﻿@model GLJ.Models.Estoque.PDEstoque
+@{
+    ViewBag.Title = "Controle de Estoque";
+}
+@using (Ajax.BeginForm("Salvar", "Estoque", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        <h3>
+            Gestão de Loja - Controle de Estoque</h3>
+        @Html.HiddenFor(m => m.Estoque.Codigo)
+        <div class="ctrlHolder">
+            @Html.HiddenFor(m => m.Estoque.CodigoProduto)
+            @Html.LabelFor(m => m.Estoque.Produto.Descricao)
+            @Html.TextBoxFor(m => m.Estoque.Produto.Descricao, new { @readonly = "readonly", @class = "textInput" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Estoque.TotalEstoque)
+            @Html.TextBoxFor(m => m.Estoque.TotalEstoque, new { @readonly = "readonly", @class = "textInput", style = "width: 5% !important" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Estoque.Livre)
+            @Html.TextBoxFor(m => m.Estoque.Livre, new { @readonly = "readonly", @class = "textInput", style = "width: 5% !important" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Estoque.Vendido)
+            @Html.TextBoxFor(m => m.Estoque.Vendido, new { @readonly = "readonly", @class = "textInput", style = "width: 5% !important" })
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Estoque.Entrada)
+            @Html.TextBoxFor(m => m.Estoque.Entrada, new { @class = "textInput", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a quantidade no estoque." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Estoque.Entrada)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}

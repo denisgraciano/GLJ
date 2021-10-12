@@ -1,0 +1,204 @@
+﻿@model GLJ.Models.Fornecedor.PDFornecedor
+@{
+    ViewBag.Title = "Cadastro de Fornecedor para a Loja";
+}
+@section JavaScript
+{
+    <script src="@Url.Content("~/Scripts/jquery.selectboxes/jquery.selectboxes.js")" type="text/javascript"></script>
+}
+<div class="divTituloPagina">
+    <h3>@ViewBag.Title</h3>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Setar o nome do controle de Cidade
+        $('#cmbEstado').attr('name', 'Fornecedor.UF');
+        $('#cmbCidade').attr('name', 'Fornecedor.CodigoCidade');
+        $('#cnpj').setMask();
+        $('#cep').setMask();
+        $('#phone').setMask();
+        $('#cpf').setMask();
+
+
+        if ($('#tipoCliente').val() == 'PessoaJuridica') {
+            $('#cmbtipoPessoa').val(2);
+            $('#CNPJ').show();
+            $('#CPF').hide();
+        }
+        else {
+            $('#cmbtipoPessoa').val(1);
+            $('#CNPJ').hide();
+            $('#CPF').show();
+            $('#cpf').val($('#cnpj').val());
+        }
+        
+
+      
+        $('#cmbtipoPessoa').change(function () {
+
+
+            if (this.value == 2) {
+                $('#CNPJ').show();
+                $('#CPF').hide();
+                $('#cpf').val('');
+                $('#cnpj').val('');
+            }
+            else {
+                $('#CNPJ').hide();
+                $('#CPF').show();
+                $('#cnpj').val('');
+                $('#cpf').val('');
+            }
+
+            if (this.value == '') {
+                $('#CNPJ').hide();
+                $('#CPF').hide();
+            }
+
+        });
+
+
+    });
+</script>
+<div>
+    @using (Ajax.BeginForm("Salvar", "Fornecedor", new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            OnSuccess = "success"
+        }, new { enctype = "multipart/form-data", @class = "uniForm" }
+    ))
+    {
+       @Html.ValidationSummary(true)
+        <fieldset class="inlineLabels">
+            @Html.HiddenFor(m => m.Fornecedor.Codigo)
+            @Html.HiddenFor(m => m.Fornecedor.TipoCliente, new { id="tipoCliente" })
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Nome)
+                @Html.HiddenFor(m => m.Fornecedor.Codigo)
+                @Html.TextBoxFor(m => m.Fornecedor.Nome, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome Fantasia da Loja" alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Nome)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.RazaoSocial)
+                @Html.TextBoxFor(m => m.Fornecedor.RazaoSocial, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Razão Social." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.RazaoSocial)</p>
+            </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.Fornecedor.TipoCliente)
+            @Html.DropDownListFor(m => m.Fornecedor.TipoCliente, TempData["TipoPessoa"] as IEnumerable<SelectListItem>,"Selecione um Tipo de Cliente", new { @class = "textInput", id = "cmbtipoPessoa", style = "width: 15% !important" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o nome Do Cliente" alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.Fornecedor.Nome)</p>
+        </div>
+            <div class="ctrlHolder", hidden=true, id="CPF">
+                @Html.LabelFor(m => m.Fornecedor.CPF)
+                @Html.TextBoxFor(m => m.Fornecedor.CPF, new { @class = "textInput", style = "width: 15% !important", id = "cpf", alt = "cpf" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.CPF)</p>
+            </div>
+            <div class="ctrlHolder", id="CNPJ">
+                @Html.LabelFor(m => m.Fornecedor.CNPJ)
+                @Html.TextBoxFor(m => m.Fornecedor.CNPJ, new { @class = "textInput", style = "width: 15% !important", id = "cnpj", alt = "cnpj" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CNPJ." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.CNPJ)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.InsEst)
+                @Html.TextBoxFor(m => m.Fornecedor.InsEst, new { @class = "textInput", style = "width: 15% !important" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Inscrição Estadual." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.InsEst)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.CEP)
+                @Html.TextBoxFor(m => m.Fornecedor.CEP, new { @class = "textInput", style = "width: 15% !important", id = "cep", alt = "cep" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o CEP." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.CEP)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Endereco)
+                @Html.TextBoxFor(m => m.Fornecedor.Endereco, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Endereço." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Endereco)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.NumeroEndereco)
+                @Html.TextBoxFor(m => m.Fornecedor.NumeroEndereco, new { @class = "textInput", style = "width: 15% !important" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Número do Endereço." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.NumeroEndereco)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Complemento)
+                @Html.TextBoxFor(m => m.Fornecedor.Complemento, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Complemento." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Complemento)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Bairro)
+                @Html.TextBoxFor(m => m.Fornecedor.Bairro, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Bairro." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Bairro)</p>
+            </div>
+            @Html.Partial("_EstadoCidade")
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Fone)
+                @Html.TextBoxFor(m => m.Fornecedor.Fone, new { @class = "textInput", style = "width: 15% !important", id = "phone", alt = "phone" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Telefone." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Fone)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Email)
+                @Html.TextBoxFor(m => m.Fornecedor.Email, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Email." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Email)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.EmailAssistencia)
+                @Html.TextBoxFor(m => m.Fornecedor.EmailAssistencia, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Email de Assistência Técnica." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.EmailAssistencia)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.EmailVendedor)
+                @Html.TextBoxFor(m => m.Fornecedor.EmailVendedor, new { @class = "textInput" })
+                <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Email do Vendedor." alt="" />
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.EmailVendedor)</p>
+            </div>
+            <div class="ctrlHolder">
+                @Html.LabelFor(m => m.Fornecedor.Ativo)
+                @Html.CheckBoxFor(m => m.Fornecedor.Ativo, new { @class = "textInput" })
+                <p class="formHint">
+                    @Html.ValidationMessageFor(m => m.Fornecedor.Ativo)</p>
+            </div>
+            <div class="buttonHolder">
+                <input type="submit" class="primaryAction" value="Salvar" />
+                @if (Model.Fornecedor.Codigo > 0)
+                {
+                    <div class="secondaryAction">
+                        @Html.ActionLink("Inserir Contatos", "CadastroContatos", new { codigoFornecedor = Model.Fornecedor.Codigo })
+                        <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe os dados de contatos da Loja." alt="" />
+                    </div>
+                    <script>
+                        $('#cmbCidade').removeAttr("disabled");
+                    </script>
+                }
+                
+            </div>
+        </fieldset>
+    }
+</div>

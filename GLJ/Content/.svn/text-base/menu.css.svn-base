@@ -1,0 +1,401 @@
+﻿/* ----------------------------------
+    NIVEL UM
+-----------------------------------*/
+ 
+ul.dropdown {
+    position: relative;
+    z-index: 999;
+}
+ 
+ul.dropdown li {
+    background: #687581;
+    float: left;
+    font-weight: bold;
+    z-index: 999;
+}
+ 
+ul.dropdown a:hover {
+    color: #000;
+}
+ 
+ul.dropdown a:active {
+    color: #ffa500;
+}
+ 
+ul.dropdown li a {
+    border-right: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    display: block;
+    padding: 4px 8px;
+}
+ 
+ul.dropdown li:last-child a {
+    border-right: none;
+} /* IE */
+ 
+ul.dropdown li.hover, ul.dropdown li:hover {
+    background: #bbc1c5;
+    color: black;
+    position: relative;
+}
+ 
+ul.dropdown li.hover a {
+    color: #fff;
+    font-weight: bold;
+}
+ 
+/*----------------------------------
+    NIVEL 2
+----------------------------------*/
+ 
+ul.dropdown ul {
+    width: 220px;
+    visibility: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+}
+ 
+ul.dropdown ul li {
+    font-weight: normal;
+    background: #687581;
+    color: #fff;
+    border-bottom: 1px solid #ccc;
+    float: none;
+}
+ 
+/* IE 6 & 7 */
+ul.dropdown ul li a {
+    border-right: none;
+    width: 100%;
+    display: inline-block;
+} 
+ 
+/*----------------------------------
+    NIVEL 3
+-----------------------------------*/
+ 
+ul.dropdown ul ul {
+    left: 100%;
+    top: 0;
+}
+ 
+ul.dropdown li:hover > ul {
+    visibility: visible;
+}
+
+/* begin Menu */
+/* menu structure */
+
+.artmenu a, .artmenu a:link, .artmenu a:visited, .artmenu a:hover
+{
+	text-align:left;
+	text-decoration:none;
+	outline:none;
+	letter-spacing:normal;
+	word-spacing:normal;
+}
+
+.artmenu, .artmenu ul
+{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	list-style-type: none;
+	display: block;
+}
+
+.artmenu li
+{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	display: block;
+	float: left;
+	position: relative;
+	z-index: 5;
+	background:none;
+}
+
+.artmenu li:hover
+{
+	z-index: 10000;
+	white-space: normal;
+}
+
+.artmenu li li
+{
+	float: none;
+}
+
+.artmenu ul
+{
+	visibility: hidden;
+	position: absolute;
+	z-index: 10;
+	left: 0;
+	top: 0;
+	background:none;
+}
+
+.artmenu li:hover>ul
+{
+	visibility: visible;
+	top: 100%;
+}
+
+.artmenu li li:hover>ul
+{
+	top: 0;
+	left: 100%;
+}
+
+.artmenu:after, .artmenu ul:after
+{
+	content: ".";
+	height: 0;
+	display: block;
+	visibility: hidden;
+	overflow: hidden;
+	clear: both;
+}
+.artmenu, .artmenu ul
+{
+	min-height: 0;
+}
+
+.artmenu ul
+{
+	background-image: url(../Content/img/spacer.gif);
+	padding: 10px 30px 30px 30px;
+	margin: -10px 0 0 -30px;
+}
+
+.artmenu ul ul
+{
+	padding: 30px 30px 30px 10px;
+	margin: -30px 0 0 -10px;
+}
+
+
+
+
+/* menu structure */
+
+.artmenu
+{
+	padding: 0px 0px 0px 0px;
+}
+
+.nav
+{
+	position: relative;
+	height: 25px;
+	z-index: 100;
+}
+
+.nav .l, .nav .r
+{
+	position: absolute;
+	z-index: -1;
+	height: 25px;
+	margin-top: 0px;
+	/*background-image: url('../Content/img/nav.png');*/
+}
+
+
+.nav .l
+{
+	left: 0;
+	right:0px;
+}
+
+.nav .r
+{
+	right: 0;
+	width: 894px;
+	clip: rect(auto, auto, auto, 894px);
+}
+
+/* end Menu */
+
+/* begin MenuItem */
+.artmenu ul li
+{
+	clear: both;
+}
+
+.artmenu a
+{
+	position:relative;
+	display: block;
+	overflow:hidden;
+	height: 25px;
+	cursor: pointer;
+	text-decoration: none;
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+
+.artmenu a .r, .artmenu a .l
+{
+	position:absolute;
+	display: block;
+	height: 75px;	
+}
+
+.artmenu a .l
+{
+	left:0;
+	right:0px;
+}
+
+.artmenu a .r
+{
+	width:400px;
+	right:0;
+	clip: rect(auto, auto, auto, 400px);
+}
+
+.artmenu a .t 
+{
+	font-size: 11px;
+	font-style: normal;
+	font-weight: normal;
+	color: #C9D2D4;
+	padding: 0 17px;
+	margin: 0 0px;
+	line-height: 25px;
+	text-align: center;
+}
+
+.artmenu a:hover .l, .artmenu a:hover .r
+{
+	top:-25px;
+}
+
+.artmenu li:hover>a .l, .artmenu li:hover>a .r
+{
+	top:-25px;
+}
+
+.artmenu li:hover a .l, .artmenu li:hover a .r
+{
+	top:-25px;
+}
+.artmenu a:hover .t
+{
+	color: #EDF4F8;
+}
+
+.artmenu li:hover a .t
+{
+	color: #EDF4F8;
+}
+
+.artmenu li:hover>a .t
+{
+	color: #EDF4F8;
+}
+
+
+.artmenu a.active .l, .artmenu a.active .r
+{
+	top: -50px;
+}
+
+.artmenu a.active .t
+{
+	color: #CBEAF6;
+}
+
+
+/* end MenuItem */
+
+/* begin MenuSeparator */
+.nav .separator
+{
+	display: block;
+	width: 1px;
+	height: 25px;
+	background-image: url('../Content/img/MenuSeparator.png');
+}
+
+/* end MenuSeparator */
+
+/* begin MenuSubItem */
+.artmenu ul a
+{
+	display:block;
+	text-align: center;
+	white-space: nowrap;
+	height: 20px;
+	width: 180px;
+	overflow:hidden;
+	line-height: 20px;
+	margin-right: auto;
+
+
+	background-image: url('../Content/img/subitem-bg.png');
+	background-position: left top;
+	background-repeat: repeat-x;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #B8C4C6;
+}
+
+.nav ul.artmenu ul span, .nav ul.artmenu ul span span
+{
+	display: inline;
+	float: none;
+	margin: inherit;
+	padding: inherit;
+	background-image: none;
+	text-align: inherit;
+	text-decoration: inherit;
+}
+
+.artmenu ul a, .artmenu ul a:link, .artmenu ul a:visited, .artmenu ul a:hover, .artmenu ul a:active, .nav ul.artmenu ul span, .nav ul.artmenu ul span span
+{
+	text-align: left;
+	text-indent: 12px;
+	text-decoration: none;
+	line-height: 20px;
+	color: #4B5B5D;
+	font-size: 10px;
+	font-style: normal;
+	font-weight: normal;
+}
+
+.artmenu ul ul a
+{
+	margin-left: auto;
+}
+
+.artmenu ul li a:hover
+{
+	color: #000000;
+	border-color: #B8C4C6;
+	background-position: 0 -20px;
+}
+
+.artmenu ul li:hover>a
+{
+	color: #000000;
+	border-color: #B8C4C6;
+	background-position: 0 -20px;
+}
+
+.nav .artmenu ul li a:hover span, .nav .artmenu ul li a:hover span span
+{
+	color: #000000;
+}
+
+.nav .artmenu ul li:hover>a span, .nav .artmenu ul li:hover>a span span
+{
+	color: #000000;
+}
+
+
+/* end MenuSubItem */

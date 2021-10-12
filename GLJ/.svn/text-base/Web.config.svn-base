@@ -1,0 +1,116 @@
+﻿<?xml version="1.0"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  http://go.microsoft.com/fwlink/?LinkId=152368
+  -->
+<configuration>
+  <configSections>
+    <sectionGroup name="system.web.extensions" type="System.Web.Configuration.SystemWebExtensionsSectionGroup, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35">
+      <sectionGroup name="scripting" type="System.Web.Configuration.ScriptingSectionGroup, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35">
+        <section name="scriptResourceHandler" type="System.Web.Configuration.ScriptingScriptResourceHandlerSection, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" allowDefinition="MachineToApplication" />
+        <sectionGroup name="webServices" type="System.Web.Configuration.ScriptingWebServicesSectionGroup, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35">
+          <section name="jsonSerialization" type="System.Web.Configuration.ScriptingJsonSerializationSection, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" allowDefinition="Everywhere" />
+          <section name="profileService" type="System.Web.Configuration.ScriptingProfileServiceSection, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" allowDefinition="MachineToApplication" />
+          <section name="authenticationService" type="System.Web.Configuration.ScriptingAuthenticationServiceSection, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" allowDefinition="MachineToApplication" />
+          <section name="roleService" type="System.Web.Configuration.ScriptingRoleServiceSection, System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" allowDefinition="MachineToApplication" />
+        </sectionGroup>
+      </sectionGroup>
+    </sectionGroup>
+    <!--Seções customizadas-->
+    <sectionGroup name="Onion">
+      <section name="DataBase" type="Onion.Configuration.DataBaseSectionHandler, Onion.Data" allowLocation="true" allowDefinition="Everywhere" />
+    </sectionGroup>
+  </configSections>
+  <Onion>
+    <DataBase>
+      <!-- Configuração Will -->
+      <DefaultConnection
+        Name="Default"
+        ConnectionString="Data Source=WILL-PC;Initial Catalog=GLJ;User ID=sa;Password=sa123" >
+      </DefaultConnection>
+      <!-- Configuração Denis
+      <DefaultConnection Name="Default" ConnectionString="Data Source=DGVMPC;Initial Catalog=GLJ;User ID=acesso;Password=acesso">
+      </DefaultConnection>-->
+      <!-- Configuração Spread
+      <DefaultConnection
+        Name="Default"
+        ConnectionString="Data Source=10.9.9.47\bb_mft;Initial Catalog=GLJ;User ID=acesso;Password=acesso" >
+      </DefaultConnection>-->
+      <!--<DefaultConnection
+       Name="Default"
+       ConnectionString="Data Source=ESSPO02SPREAD15\SQLEXPRESS;Initial Catalog=GLJ;User ID=sa;Password=sa123" >
+      </DefaultConnection>-->
+      <CustomConnections>
+      </CustomConnections>
+    </DataBase>
+    <!--<DataBase>
+      <DefaultConnection
+        Name="Default"
+        ConnectionString="Data Source=WILL-PC;Initial Catalog=GLJ;User ID=sa;Password=sa123" >
+      </DefaultConnection>
+      <CustomConnections>
+      </CustomConnections>
+    </DataBase>-->
+  </Onion>
+  <appSettings>
+    <add key="webpages:Version" value="1.0.0.0" />
+    <add key="ClientValidationEnabled" value="true" />
+    <add key="UnobtrusiveJavaScriptEnabled" value="true" />   
+  </appSettings>
+  <connectionStrings>
+    <add name="CatRelEntities" connectionString="metadata=res://*/Relatorio.csdl|res://*/Relatorio.ssdl|res://*/Relatorio.msl;provider=System.Data.SqlClient;provider connection string=&quot;Data Source=ESSPO02SPREAD15\SQLEXPRESS;Initial Catalog=CAT;User ID=sa;Password=sa123;MultipleActiveResultSets=True&quot;" providerName="System.Data.EntityClient" />
+    <!--Spread
+    <add name="DERelatorioContainer" connectionString="metadata=res://*/DERelatorio.csdl|res://*/DERelatorio.ssdl|res://*/DERelatorio.msl;provider=System.Data.SqlClient;provider connection string=&quot;data source=10.9.9.47\bb_mft;initial catalog=CAT;persist security info=True;user id=acesso;password=acesso;multipleactiveresultsets=True;App=EntityFramework&quot;" providerName="System.Data.EntityClient" />
+    -->
+    <!--Denis-->
+    <add name="DERelatorioContainer" connectionString="metadata=res://*/DERelatorio.csdl|res://*/DERelatorio.ssdl|res://*/DERelatorio.msl;provider=System.Data.SqlClient;provider connection string=&quot;data source=DGVMPC;initial catalog=CAT;persist security info=True;user id=acesso;password=acesso;multipleactiveresultsets=True;App=EntityFramework&quot;" providerName="System.Data.EntityClient" />
+    <!--<add name="CatRelEntities" connectionString="metadata=res://*/Relatorio.csdl|res://*/Relatorio.ssdl|res://*/Relatorio.msl;provider=System.Data.SqlClient;provider connection string=&quot;Data Source=10.9.9.47\bb_mft;Initial Catalog=CAT;User ID=acesso;Password=acesso;MultipleActiveResultSets=True&quot;" providerName="System.Data.EntityClient" />-->
+  </connectionStrings>
+  <system.web>
+    <httpHandlers>
+      <add path="Reserved.ReportViewerWebControl.axd" verb="*" type="Microsoft.Reporting.WebForms.HttpHandler, Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" validate="false" />
+    </httpHandlers>
+    <compilation debug="true" targetFramework="4.0">
+      <assemblies>
+        <add assembly="System.Web.Abstractions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+        <add assembly="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+        <add assembly="System.Web.Routing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+        <add assembly="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+        <add assembly="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+      </assemblies>
+      <buildProviders>
+        <add extension=".rdlc" type="Microsoft.Reporting.RdlBuildProvider, Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+      </buildProviders>
+    </compilation>
+    <authentication mode="Forms">
+      <forms loginUrl="~/Account/LogOn" timeout="2880" />
+    </authentication>
+    <pages>
+      <namespaces>
+        <add namespace="System.Web.Helpers" />
+        <add namespace="System.Web.Mvc" />
+        <add namespace="System.Web.Mvc.Ajax" />
+        <add namespace="System.Web.Mvc.Html" />
+        <add namespace="System.Web.Routing" />
+        <add namespace="System.Web.WebPages" />
+        <add namespace="Onion.MVCHelpers" />        
+      </namespaces>
+    </pages>
+    <globalization culture="pt-BR" uiCulture="pt"/>
+  </system.web>
+  <system.webServer>
+    <validation validateIntegratedModeConfiguration="false" />
+    <modules runAllManagedModulesForAllRequests="true" />
+    <handlers>
+      <add name="ReportViewerWebControlHandler" preCondition="integratedMode" verb="*" path="Reserved.ReportViewerWebControl.axd" type="Microsoft.Reporting.WebForms.HttpHandler, Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    </handlers>
+  </system.webServer>
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly>
+        <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" />
+        <bindingRedirect oldVersion="1.0.0.0-2.0.0.0" newVersion="3.0.0.0" />
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
+</configuration>

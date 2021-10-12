@@ -1,0 +1,46 @@
+﻿@model GLJ.Models.FilialLoja.PDFilialLoja
+@{
+    ViewBag.Title = "Cadastro de Filial da Loja";
+}
+@using (Ajax.BeginForm("Salvar", "FilialLoja", new AjaxOptions()
+{
+    HttpMethod = "Post",
+    OnSuccess = "success"
+}, new { enctype = "multipart/form-data", @class = "uniForm" }
+))
+{
+    @Html.ValidationSummary(true)
+    <fieldset class="inlineLabels">
+        <h3>
+            Gestão de Loja - Cadastro de Filial da Loja</h3>
+        
+        @Html.HiddenFor(m => m.FilialLoja.Codigo)
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.FilialLoja.Nome)
+            @Html.TextBoxFor(m => m.FilialLoja.Nome, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe o Nome da Filial." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.FilialLoja.Nome)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.FilialLoja.SiglaPedidoFilial)
+            @Html.TextBoxFor(m => m.FilialLoja.SiglaPedidoFilial, new { @class = "textInput" })
+            <img src='@Url.Content("~/Content/img/info_tooltip.png")' title="Informe a Sigla do Pedido da Filial." alt="" />
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.FilialLoja.SiglaPedidoFilial)</p>
+        </div>
+        <div class="ctrlHolder">
+            @Html.LabelFor(m => m.FilialLoja.Ativo)
+            @Html.CheckBoxFor(m => m.FilialLoja.Ativo, new { @class = "textInput" })
+            <p class="formHint">
+                @Html.ValidationMessageFor(m => m.FilialLoja.Ativo)</p>
+        </div>
+        <div class="buttonHolder">
+            <input type="submit" class="primaryAction" value="Salvar" />
+        </div>
+    </fieldset>
+}
+<div>
+    <p>@Html.ActionLink("Finaliza Cadastro", "ConsultarFilialLoja")
+    </p>
+</div>

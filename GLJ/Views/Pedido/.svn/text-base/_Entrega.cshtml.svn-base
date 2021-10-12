@@ -1,0 +1,42 @@
+﻿@model  GLJ.Models.Agenda.PDAgenda
+@{
+    ViewBag.Title = "Agenda - Pedidos";
+}
+@Html.Partial("_Calendario", Model)
+<div class="line">
+</div>
+<div class="uniForm">
+    <fieldset class="inlineLabels">
+        <div class="buttonHolder">
+            <input type="button" class="primaryAction" value="Continuar" onclick="Finalizar();" />
+            <div class="secondaryAction">
+                @Html.ActionLink("Cancelar", "CancelarPedido", "Pedido")
+            </div>
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    function CarregarEntrega() {
+        $('#calendar').fullCalendar('refetchEvents');
+    }
+
+    function Finalizar() {
+        $.post('@Url.Action("Finalizar", "Pedido")', null, function (data) {
+            if (data.Success) {
+
+                $('#tabs').tabs('enable', 3);
+                $('#tabs').tabs('select', 3);
+
+                //Resumo do Pedido;
+                var html = "";
+
+                $('.success').html(data.Mensage);
+                $('.success').show();
+            }
+            else {
+                $('.error').html(data.Mensage);
+                $('.error').show();
+            }
+        });
+    }
+</script>

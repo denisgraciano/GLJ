@@ -1,0 +1,12 @@
+﻿@using GLJ.Acesso.Business.Entity;
+@model GLJ.Models.ProcessData
+@{
+    if (Session != null && Session["UsuarioLogin"] != null)
+    {
+        <img src="/Content/img/logodefault.png" style="padding: 0px 0px 0px 10px;" />        
+    }
+    else
+    {
+        <img src="/Content/img/logodefault.png" style="padding: 0px 0px 0px 10px;" />
+    }
+}
